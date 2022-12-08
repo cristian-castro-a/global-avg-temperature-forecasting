@@ -17,3 +17,4 @@ conda create --name py39 --file requirements.txt
 ```
 
 ## Data
+1. Data on Poverty by [Our World in Data](https://ourworldindata.org/): https://github.com/owid/poverty-data
