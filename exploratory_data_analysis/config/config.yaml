@@ -1,0 +1,4 @@
+datafiles:
+  pip_dataset: 'pip_dataset.csv'
+directories:
+  eda_results_dir: '../tmp/eda_results'
