@@ -13,7 +13,7 @@ def main(cfg: DictConfig) -> None:
     """
 
     # Load data: pip_dataset
-    pip_dataset = HandlingData(cfg.datafiles.pip_dataset)
+    pip_dataset = HandlingData(csv_file=cfg.datafiles.pip_dataset, data_path=cfg.directories.data)
     pip_dataset_df = pip_dataset.load_raw_data()
 
     # Get the descriptive statistics: raw pip_dataset

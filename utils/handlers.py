@@ -12,17 +12,18 @@ class HandlingData:
     - csv_file: name of raw data file stored in ../data
     """
     csv_file: str
-    data_path: Path = Path.cwd().parent.joinpath('data')
+    data_path: str
 
     def __repr__(self):
         resp = f"Data handler for {self.csv_file}"
         return resp
 
     def _check_existence(self):
-        if not self.data_path.is_dir():
-            raise Exception("Data should be in a folder named: 'data'")
+        data_path = Path(self.data_path)
+        if not data_path.is_dir():
+            raise Exception(f"Folder not found in {data_path}")
 
-        file_path = self.data_path.joinpath(self.csv_file)
+        file_path = data_path.joinpath(self.csv_file)
 
         if not file_path.is_file():
             raise Exception(f"\nThere is no file named {self.csv_file} in {self.data_path}")
@@ -35,3 +36,8 @@ class HandlingData:
 
     def load_raw_data(self):
         return self._load_raw_data()
+
+
+@dataclass
+class CountryPoverty(HandlingData):
+    ppp_version: int
