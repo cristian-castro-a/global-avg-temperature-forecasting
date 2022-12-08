@@ -3,7 +3,8 @@ import pandas as pd
 from pathlib import Path
 
 
-def plot_lines_by(data: pd.DataFrame, plot_x: str, plot_y: str, plot_by: str, path_to_results: str, file_name: str) -> None:
+def plot_lines_by(data: pd.DataFrame, plot_x: str, plot_y: str, plot_by: str, path_to_results: str,
+                  file_name: str) -> None:
     """
     Plots lines y = f(x) from a dataframe, separating series by a column name
     :param data: dataframe with data
