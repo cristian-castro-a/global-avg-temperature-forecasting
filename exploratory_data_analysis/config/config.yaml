@@ -1,0 +1,7 @@
+datafiles:
+  pip_dataset: 'pip_dataset.csv'
+directories:
+  data: '../data'
+  eda_results_dir: '../tmp/eda_results'
+data_filters:
+  ppp_version: 2017 # The poverty dataset comprehends two ppp_versions to assess data (2011, 2017)
