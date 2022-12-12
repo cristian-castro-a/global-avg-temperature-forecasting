@@ -15,7 +15,7 @@ class CSVParser:
     data_path: str
 
     def __repr__(self):
-        resp = f"Data handler for {self.csv_file}"
+        resp = f"Data parser for {self.csv_file}"
         return resp
 
     def _check_existence(self):
@@ -39,7 +39,10 @@ class CountryPoverty(CSVParser):
     """
     country_name: str
     ppp_version: int
+    reporting_level: str
 
     def load_country_data(self):
         df = self.load_raw_data()
-        return df[(df['country'] == self.country_name) & (df['ppp_version'] == self.ppp_version)]
+        return df[(df['country'] == self.country_name) &
+                  (df['ppp_version'] == self.ppp_version) &
+                  (df['reporting_level'] == self.reporting_level)]
