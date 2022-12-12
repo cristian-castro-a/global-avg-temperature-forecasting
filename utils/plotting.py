@@ -12,20 +12,20 @@ def plot_lines_by(data: pd.DataFrame, plot_x: str, plot_y: str, plot_by: str, pa
     :param path_to_results: path to point where to store results in .html
     :return: prints a .html plot
     """
+    # Checks folder existence otherwise creates folder
     path_to_results = Path(path_to_results)
+    path_to_results.mkdir(parents=True, exist_ok=True)
     path_to_file = path_to_results.joinpath(file_name)
 
-    if not path_to_results.is_dir():
-        raise Exception(f"There is no directory named '{path_to_results.name}' in: '{path_to_results.parent}'")
-
     if not plot_by in data.columns:
-        raise Exception(f"There is no column named '{plot_by}' in dataframe")
+        raise KeyError(f"There is no column named '{plot_by}' in dataframe")
 
     fig = px.line(
         data_frame=data,
         x=plot_x,
         y=plot_y,
-        color=plot_by
+        color=plot_by,
+        markers=True
     )
 
     fig.update_layout(
