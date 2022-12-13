@@ -9,13 +9,10 @@ def print_dataframe_descriptive_statistics(data: pd.DataFrame, file_name: str, p
     :param path_to_results: path to print the results
     :return: prints a .csv with the descriptive statistics
     """
+    # Checks folder existence otherwise creates folder
     path_to_results = Path(path_to_results)
-
-    if not path_to_results.is_dir():
-        raise Exception(f"There is no directory named '{path_to_results.name}' in: '{path_to_results.parent}'")
-
+    path_to_results.mkdir(parents=True, exist_ok=True)
     path_to_file = path_to_results.joinpath(file_name)
 
     descriptive_statistics = data.describe(percentiles=[0.1,0.25,0.5,0.75,0.9])
-
     descriptive_statistics.to_csv(path_to_file, index=False)
