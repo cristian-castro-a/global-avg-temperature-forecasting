@@ -8,7 +8,9 @@ Team members:
 - [Swapnali Sonkusale]()
 - [Tejas Choudekar]()
 
-## Windows Virtual Environment and Dependencies
+## Virtual Environment and Dependencies
+
+### Windows 
 This project is based on Python 3.9. For windows operating system follow below steps to get the project started:
 1. Install Anaconda
 2. Go to anaconda and write `where conda` it will give you three paths
@@ -19,10 +21,8 @@ This project is based on Python 3.9. For windows operating system follow below s
 conda create --name <env> --file requirements_windows.txt
 ```
 
-## MacOS Virtual Environment and Dependencies
-
+### MacOS
 This project is based on Python 3.9. If you own a MacOS computer with M1 chip, please use the `requirements_m1_macos.txt` file to install all dependencies necessary for this project in a Conda environment, by running the following command on your terminal:
-
 ```bash
 conda create --name py39 --file requirements.txt
 ```

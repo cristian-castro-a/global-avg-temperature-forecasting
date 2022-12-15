@@ -19,7 +19,7 @@ class CSVParser:
         return resp
 
     def _check_existence(self):
-        data_path = Path(self.data_path)
+        data_path = Path().cwd().parent.joinpath(self.data_path)
         if not data_path.is_dir():
             raise FileNotFoundError(f"Folder not found in {data_path}")
         file_path = data_path.joinpath(self.csv_file)
