@@ -1,3 +1,7 @@
+hydra:
+  output_subdir: null
+  run:
+    dir: .
 datafiles:
   pip_dataset: 'pip_dataset.csv'
 directories:
