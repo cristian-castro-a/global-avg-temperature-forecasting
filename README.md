@@ -32,4 +32,7 @@ The following datasets were used in this project:
 - owid-co2-data.csv: Data on CO2 and Greenhouse Gas Emissions by [Our World in Data](https://github.com/owid/co2-data)
 - ocean_warming.json: Ocean Warming data by [NASA](https://climate.nasa.gov/vital-signs/ocean-warming/)
 - global_temperature.txt: Global Temperature data by [NASA](https://climate.nasa.gov/vital-signs/global-temperature/)
-- oil_consumption_per_capita.csv Data on Oil consumption per capita by [Our World in Data](https://ourworldindata.org/grapher/oil-consumption-per-capita)
+- renewable_share_energy.csv: Renewable Energy Production of countries by [Our World in Data](https://ourworldindata.org/renewable-energy)
+- World_Electricity_Production.csv: World electricity production (Monthly) by [iea](https://www.iea.org/reports/monthly-electricity-statistics-overview)
+- World_Employment_Rate.csv: World Employment Rate(in percent of working population) by [OECD Data](https://data.oecd.org/emp/employment-rate.htm)
+- world_population.csv: World population data by [macrotrends](https://www.macrotrends.net/countries/WLD/world/population)
