@@ -28,3 +28,7 @@ conda create --name py39 --file requirements_m1_macos.txt
 ```
 
 ## Data
+The following datasets were used in this project:
+- owid-co2-data.csv: Data on CO2 and Greenhouse Gas Emissions by [Our World in Data](https://github.com/owid/co2-data)
+- ocean_warming.json: Ocean Warming data by [NASA](https://climate.nasa.gov/vital-signs/ocean-warming/)
+- global_temperature.txt: Global Temperature data by [NASA](https://climate.nasa.gov/vital-signs/global-temperature/)
