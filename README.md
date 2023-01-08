@@ -36,3 +36,4 @@ The following datasets were used in this project:
 - World_Electricity_Production.csv: World electricity production (Monthly) by [iea](https://www.iea.org/reports/monthly-electricity-statistics-overview)
 - World_Employment_Rate.csv: World Employment Rate(in percent of working population) by [OECD Data](https://data.oecd.org/emp/employment-rate.htm)
 - world_population.csv: World population data by [macrotrends](https://www.macrotrends.net/countries/WLD/world/population)
+- oil_consumption_per_capita.csv: Oil consumption per capita by [Our World in Data](https://ourworldindata.org/grapher/oil-consumption-per-capita)
