@@ -199,6 +199,22 @@ df_final.drop(index=df_final.index[:85], axis=0, inplace=True)
 #impute missing values
 df_final.isnull().sum()
 
+# visualize features
+plt.figure(figsize=(16, 8), dpi=150)
+df_final['co2'].plot(label='co2', color='orange')
+df_final['population'].plot(label='population')
+df_final['gdp'].plot(label='gdp')
+
+# adding title to the plot
+plt.title('Development of features')
+
+# adding Label to the x-axis
+plt.xlabel('Years')
+
+# adding legend to the curve
+plt.legend()
+
+
 
 
 df_final.to_csv(r'~/Desktop/RWTH_DDS/EMECS/Project_TimeSeries/poverty-forecasting/data/yearly_aggr_data.csv')
