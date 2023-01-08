@@ -3,7 +3,14 @@ hydra:
   run:
     dir: .
 datafiles:
-  pip_dataset: 'pip_dataset.csv'
+#  pip_dataset: 'pip_dataset.csv'
+  global_temperature: 'global_temperature.txt'
+  ocean_warning: 'Ocean_warning.json'
+  renewable_share_energy: 'renewable_share_energy.csv'
+  world_electricity_production: 'World_Electricity_Production.csv'
+  world_employment_rate: 'World_Employment_Rate.csv'
+  world_population: 'world_population.csv'
+  world_co2: 'owid-co2-data.csv'
 directories:
   data: 'data'
   eda_results_dir: 'tmp/eda_results'
