@@ -1,8 +1,10 @@
+import logging
+
 import hydra
 from omegaconf import DictConfig
-import logging
-from utils.sdk_config import SDKConfig
+
 from utils.parsers import read_data
+from utils.sdk_config import SDKConfig
 
 
 logger = logging.getLogger(__name__)

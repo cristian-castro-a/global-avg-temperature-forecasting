@@ -1,9 +1,10 @@
+import json
+import logging
 from dataclasses import dataclass
 from pathlib import Path
-import pandas as pd
 from typing import Dict
-import logging
-import json
+
+import pandas as pd
 
 
 logger = logging.getLogger(__name__)
@@ -70,6 +71,8 @@ def read_data(data_dir: Path, config: Dict) -> Dict:
     Returns:
         dictionary of dataframe, each representing each file in data_dir
     """
+    logger.info("Loading raw data")
+
     data_dict = {}
 
     for df, dataset in config['datafiles'].items():
@@ -83,6 +86,5 @@ def read_data(data_dir: Path, config: Dict) -> Dict:
         else:
             raise FileNotFoundError(f"Extension of file {dataset} not known.")
         data_dict[df] = parser.load_raw_data()
-        print('test')
 
     return data_dict
