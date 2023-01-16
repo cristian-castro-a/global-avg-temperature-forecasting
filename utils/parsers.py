@@ -1,31 +1,25 @@
 from dataclasses import dataclass
 from pathlib import Path
 import pandas as pd
+from typing import Dict
+import logging
+import json
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
 class CSVParser:
-    """
-    Class for parsing csv data.
-
-    Expected parameters:
-    - csv_file: name of raw data file stored in data_path
-    """
-    csv_file: str
-    data_path: str
-
-    def __repr__(self):
-        resp = f"Data parser for {self.csv_file}"
-        return resp
+    data_file_path: Path
 
     def _check_existence(self):
-        data_path = Path().cwd().parent.joinpath(self.data_path)
-        if not data_path.is_dir():
-            raise FileNotFoundError(f"Folder not found in {data_path}")
-        file_path = data_path.joinpath(self.csv_file)
-        if not file_path.is_file():
-            raise FileNotFoundError(f"\nThere is no file named {self.csv_file} in {data_path}")
-        return file_path
+        data_dir = self.data_file_path.parent
+        if not data_dir.is_dir():
+            raise FileNotFoundError(f"Folder not found: {data_dir}")
+        if not self.data_file_path.is_file():
+            raise FileNotFoundError(f"\nThere is no file named {self.data_file_path.name} in {data_dir}")
+        return self.data_file_path
 
     def load_raw_data(self):
         file_path = self._check_existence()
@@ -33,16 +27,62 @@ class CSVParser:
 
 
 @dataclass
-class CountryPoverty(CSVParser):
-    """
-    Class to store poverty data per country per ppp_version
-    """
-    country_name: str
-    ppp_version: int
-    reporting_level: str
+class JSONParser:
+    data_file_path: Path
 
-    def load_country_data(self):
-        df = self.load_raw_data()
-        return df[(df['country'] == self.country_name) &
-                  (df['ppp_version'] == self.ppp_version) &
-                  (df['reporting_level'] == self.reporting_level)]
+    def _check_existence(self):
+        data_dir = self.data_file_path.parent
+        if not data_dir.is_dir():
+            raise FileNotFoundError(f"Folder not found: {data_dir}")
+        if not self.data_file_path.is_file():
+            raise FileNotFoundError(f"\nThere is no file named {self.data_file_path.name} in {data_dir}")
+        return self.data_file_path
+
+    def load_raw_data(self):
+        file_path = self._check_existence()
+        with open(file_path) as json_file:
+            json_dict = json.load(json_file)
+        return pd.DataFrame.from_dict(json_dict, orient='index', columns=['value'])
+
+
+@dataclass
+class TXTParser:
+    data_file_path: Path
+
+    def _check_existence(self):
+        data_dir = self.data_file_path.parent
+        if not data_dir.is_dir():
+            raise FileNotFoundError(f"Folder not found: {data_dir}")
+        if not self.data_file_path.is_file():
+            raise FileNotFoundError(f"\nThere is no file named {self.data_file_path.name} in {data_dir}")
+        return self.data_file_path
+
+    def load_raw_data(self):
+        file_path = self._check_existence()
+        return pd.read_csv(file_path, delim_whitespace=True)
+
+
+def read_data(data_dir: Path, config: Dict) -> Dict:
+    """
+    Parameters:
+        data_dir: Path to data folder with raw data
+        config: Config file
+    Returns:
+        dictionary of dataframe, each representing each file in data_dir
+    """
+    data_dict = {}
+
+    for df, dataset in config['datafiles'].items():
+        file_path = data_dir / dataset
+        if dataset.endswith('.csv'):
+            parser = CSVParser(data_file_path=file_path)
+        elif dataset.endswith('.txt'):
+            parser = TXTParser(data_file_path=file_path)
+        elif dataset.endswith('.json'):
+            parser = JSONParser(data_file_path=file_path)
+        else:
+            raise FileNotFoundError(f"Extension of file {dataset} not known.")
+        data_dict[df] = parser.load_raw_data()
+        print('test')
+
+    return data_dict
