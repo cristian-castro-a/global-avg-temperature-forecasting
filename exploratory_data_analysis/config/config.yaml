@@ -11,3 +11,5 @@ datafiles:
   world_electricity_production: 'World_Electricity_Production.csv'
   world_employment_rate: 'World_Employment_Rate.csv'
   world_population: 'world_population.csv'
+  oil_consumption_per_capita: 'oil_consumption_per_capita.csv'
+  global_energy_substitution: 'global_energy_substitution.csv'
