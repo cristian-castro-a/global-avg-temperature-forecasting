@@ -8,7 +8,6 @@ datafiles:
   ocean_warming: 'Ocean_Warming.json'
   co2_emissions: 'owid-co2-data.csv'
   renewable_energy_share: 'renewable_share_energy.csv'
-  world_electricity_production: 'World_Electricity_Production.csv'
   world_employment_rate: 'World_Employment_Rate.csv'
   world_population: 'world_population.csv'
   oil_consumption_per_capita: 'oil_consumption_per_capita.csv'

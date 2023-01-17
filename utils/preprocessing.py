@@ -19,6 +19,17 @@ def preprocess_co2_emissions(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def preprocess_global_temperature(df: pd.DataFrame) -> pd.DataFrame:
+    df.insert(loc=1, column='month', value=12)
+    df.insert(loc=2, column='day', value=31)
+    df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year','month','day']]))
+    df.drop(['Year','month','day'], axis=1, inplace=True)
+    return df
+
+
+def preprocess_ocean_warming(df: pd.DataFrame) -> pd.DataFrame:
+    df.reset_index(inplace=True)
+    df.rename(columns={'index': 'date', 'value': 'zettajoules'}, inplace=True)
+    df['date'] = pd.to_datetime(df['date'])
     return df
 
 
@@ -35,6 +46,8 @@ def preprocess_dataframe(df_name: str, df: pd.DataFrame) -> pd.DataFrame:
         preprocessed_df = preprocess_co2_emissions(df=df)
     if df_name == 'global_temperature':
         preprocessed_df = preprocess_global_temperature(df=df)
+    if df_name == 'ocean_warming':
+        preprocessed_df = preprocess_ocean_warming(df=df)
     return preprocessed_df
 
 
