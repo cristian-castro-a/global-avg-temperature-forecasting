@@ -18,6 +18,10 @@ def preprocess_co2_emissions(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def preprocess_global_temperature(df: pd.DataFrame) -> pd.DataFrame:
+    return df
+
+
 def preprocess_dataframe(df_name: str, df: pd.DataFrame) -> pd.DataFrame:
     """
     Parameters:
@@ -29,6 +33,8 @@ def preprocess_dataframe(df_name: str, df: pd.DataFrame) -> pd.DataFrame:
     preprocessed_df = pd.DataFrame()
     if df_name == 'co2_emissions':
         preprocessed_df = preprocess_co2_emissions(df=df)
+    if df_name == 'global_temperature':
+        preprocessed_df = preprocess_global_temperature(df=df)
     return preprocessed_df
 
 
