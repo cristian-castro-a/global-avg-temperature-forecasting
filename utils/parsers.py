@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Dict
 
 import pandas as pd
+from omegaconf import DictConfig
 
 
 logger = logging.getLogger(__name__)
@@ -63,7 +64,7 @@ class TXTParser:
         return pd.read_csv(file_path, delim_whitespace=True)
 
 
-def read_data(data_dir: Path, config: Dict) -> Dict:
+def read_data(data_dir: Path, config: DictConfig) -> Dict:
     """
     Parameters:
         data_dir: Path to data folder with raw data
