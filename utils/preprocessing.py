@@ -1,6 +1,10 @@
+import logging
 from typing import Dict
 
 import pandas as pd
+
+
+logger = logging.getLogger(__name__)
 
 
 def preprocess_co2_emissions(df: pd.DataFrame) -> pd.DataFrame:
@@ -36,6 +40,8 @@ def preprocess_data(data_dict: Dict) -> Dict:
         Dictionary of preprocessed dataframes
     """
     processed_data_dict = {}
+    logger.info('Preprocessing dataframes')
     for df_name, df in data_dict.items():
+        logger.info(f'Preprocessing dataframe: {df_name}')
         processed_data_dict[df_name] = preprocess_dataframe(df_name=df_name, df=df)
     return processed_data_dict
