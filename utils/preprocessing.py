@@ -54,8 +54,11 @@ def preprocess_global_temperature(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def preprocess_ocean_warming(df: pd.DataFrame) -> pd.DataFrame:
-    df.reset_index(inplace=True)
-    df.rename(columns={'index': 'date', 'value': 'ocean_warming'}, inplace=True)
+    df.insert(loc=1, column='month', value=12)
+    df.insert(loc=2, column='day', value=31)
+    df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year','month','day']]))
+    df.drop([col for col in df.columns if col not in ('date', 'NOAA')], axis=1, inplace=True)
+    df.rename(columns={'index': 'date', 'NOAA': 'ocean_warming'}, inplace=True)
     df['date'] = pd.to_datetime(df['date'])
     return df
 
