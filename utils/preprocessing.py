@@ -40,6 +40,7 @@ def preprocess_co2_emissions(df: pd.DataFrame) -> pd.DataFrame:
     df.drop(['year','month','day'], axis=1, inplace=True)
     # To work with tonnes of co2 it is necessary a conversion factor of 3.664
     df['co2'] = df['co2']/3.664
+    df.rename(columns={'date': 'date', 'co2': 'co2_emissions'}, inplace=True)
     return df
 
 
@@ -54,7 +55,7 @@ def preprocess_global_temperature(df: pd.DataFrame) -> pd.DataFrame:
 
 def preprocess_ocean_warming(df: pd.DataFrame) -> pd.DataFrame:
     df.reset_index(inplace=True)
-    df.rename(columns={'index': 'date', 'value': 'zettajoules'}, inplace=True)
+    df.rename(columns={'index': 'date', 'value': 'ocean_warming'}, inplace=True)
     df['date'] = pd.to_datetime(df['date'])
     return df
 
