@@ -32,9 +32,6 @@ class Windowing:
         return np.array(X), np.array(y)
 
 
-
-
-
 def preprocess_co2_emissions(df: pd.DataFrame) -> pd.DataFrame:
     df = df.groupby(by=['year']).sum().reset_index()[['year','co2']]
     df.insert(loc=1, column='month', value=12)

@@ -4,7 +4,7 @@ import hydra
 from omegaconf import DictConfig
 
 from utils.parsers import read_data
-from utils.preprocessing import preprocess_data, Windowing
+from utils.preprocessing import preprocess_data
 from utils.sdk_config import SDKConfig
 
 
