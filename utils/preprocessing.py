@@ -1,10 +1,38 @@
 import logging
-from typing import Dict
+from typing import Dict, Tuple
 
 import pandas as pd
+import numpy as np
 
 
 logger = logging.getLogger(__name__)
+
+
+class Windowing:
+    """
+    Class to create fixed length sequences to train a LSTM Model
+    """
+    def __init__(self, df: pd.DataFrame):
+        self.df = df
+
+    def get_input_sequences(self, on_column: str, window: int = 5) -> Tuple[np.array, np.array]:
+        assert isinstance(window, int), f" 'Window' is expected to be an integer, but got {type(window)}."
+        assert isinstance(on_column, str), f" 'On_column' is expected to be a string, but got {type(on_column)}."
+        assert on_column in self.df.columns, f" {on_column} is not a column in the dataframe."
+
+        df_as_np = self.df[on_column].to_numpy()
+
+        X = []
+        y = []
+
+        for i in range(len(df_as_np)-window):
+            X.append([[a] for a in df_as_np[i:i+window]])
+            y.append(df_as_np[i+window])
+
+        return np.array(X), np.array(y)
+
+
+
 
 
 def preprocess_co2_emissions(df: pd.DataFrame) -> pd.DataFrame:
