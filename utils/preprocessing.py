@@ -1,10 +1,35 @@
 import logging
-from typing import Dict
+from typing import Dict, Tuple
 
 import pandas as pd
+import numpy as np
 
 
 logger = logging.getLogger(__name__)
+
+
+class Windowing:
+    """
+    Class to create fixed length sequences to train a LSTM Model
+    """
+    def __init__(self, df: pd.DataFrame):
+        self.df = df
+
+    def get_input_sequences(self, on_column: str, window: int = 5) -> Tuple[np.array, np.array]:
+        assert isinstance(window, int), f" 'Window' is expected to be an integer, but got {type(window)}."
+        assert isinstance(on_column, str), f" 'On_column' is expected to be a string, but got {type(on_column)}."
+        assert on_column in self.df.columns, f" {on_column} is not a column in the dataframe."
+
+        df_as_np = self.df[on_column].to_numpy()
+
+        X = []
+        y = []
+
+        for i in range(len(df_as_np)-window):
+            X.append([[a] for a in df_as_np[i:i+window]])
+            y.append(df_as_np[i+window])
+
+        return np.array(X), np.array(y)
 
 
 def preprocess_co2_emissions(df: pd.DataFrame) -> pd.DataFrame:
@@ -15,6 +40,7 @@ def preprocess_co2_emissions(df: pd.DataFrame) -> pd.DataFrame:
     df.drop(['year','month','day'], axis=1, inplace=True)
     # To work with tonnes of co2 it is necessary a conversion factor of 3.664
     df['co2'] = df['co2']/3.664
+    df.rename(columns={'date': 'date', 'co2': 'co2_emissions'}, inplace=True)
     return df
 
 
@@ -22,13 +48,14 @@ def preprocess_global_temperature(df: pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=1, column='month', value=12)
     df.insert(loc=2, column='day', value=31)
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year','month','day']]))
-    df.drop(['Year','month','day'], axis=1, inplace=True)
+    df.drop(['Year','month','day', 'Lowess(5)'], axis=1, inplace=True)
+    df.rename(columns={'date': 'date', 'No_Smoothing': 'global_temperature'}, inplace=True)
     return df
 
 
 def preprocess_ocean_warming(df: pd.DataFrame) -> pd.DataFrame:
     df.reset_index(inplace=True)
-    df.rename(columns={'index': 'date', 'value': 'zettajoules'}, inplace=True)
+    df.rename(columns={'index': 'date', 'value': 'ocean_warming'}, inplace=True)
     df['date'] = pd.to_datetime(df['date'])
     return df
 

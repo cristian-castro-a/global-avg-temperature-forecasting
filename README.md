@@ -1,5 +1,7 @@
 # Global Average Temperature Forecasting
 
+![GitHub contributors](https://img.shields.io/github/contributors/cristian-castro-a/global-avg-temperature-forecasting?style=plastic) ![GitHub last commit](https://img.shields.io/github/last-commit/cristian-castro-a/global-avg-temperature-forecasting)  ![GitHub top language](https://img.shields.io/github/languages/top/cristian-castro-a/global-avg-temperature-forecasting) ![GitHub repo size](https://img.shields.io/github/repo-size/cristian-castro-a/global-avg-temperature-forecasting) ![GitHub Repo stars](https://img.shields.io/github/stars/cristian-castro-a/global-avg-temperature-forecasting?style=social)
+
 This is a project that aims at **forecasting global average temperature** as a multivariate problem. 
 
 Team members:
