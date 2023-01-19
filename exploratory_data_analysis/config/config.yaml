@@ -5,7 +5,7 @@ hydra:
 
 datafiles:
   global_temperature: 'global_temperature.txt'
-  ocean_warming: 'Ocean_Warming.json'
+  ocean_warming: 'ocean_heat.csv'
   co2_emissions: 'owid-co2-data.csv'
   renewable_energy_share: 'renewable_share_energy.csv'
   world_employment_rate: 'World_Employment_Rate.csv'
