@@ -47,7 +47,8 @@ def preprocess_global_temperature(df: pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=1, column='month', value=12)
     df.insert(loc=2, column='day', value=31)
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year','month','day']]))
-    df.drop(['Year','month','day'], axis=1, inplace=True)
+    df.drop(['Year','month','day', 'Lowess(5)'], axis=1, inplace=True)
+    df.rename(columns={'date': 'date', 'No_Smoothing': 'global_temperature'}, inplace=True)
     return df
 
 
