@@ -63,6 +63,25 @@ def preprocess_ocean_warming(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def preprocess_world_employment(df:pd.DataFrame) -> pd.DataFrame:
+    df = df.groupby(by=['TIME']).mean().reset_index()
+    df = df[df['TIME'] > 1964]
+    df = df.rename(columns = {'TIME':'year'})
+    df.insert(loc=1, column='month', value=12)
+    df.insert(loc=2, column='day', value=31)
+    df.insert(loc=0, column='date', value=pd.to_datetime(df[['year','month','day']]))
+    df.drop(['year','month','day'], axis=1, inplace=True)
+    df.rename(columns= {'Value':'world_employment_rate'}, inplace=True)
+    return df
+
+def preprocess_world_population(df:pd.DataFrame) -> pd.DataFrame:
+    df.reset_index(inplace= True)
+    df.rename(columns={' Population':'world_population'}, inplace=True)
+    df.date = pd.to_datetime(df['date'])
+    df = df[df['date'].dt.year > 1964]
+    df=df[['date','world_population']]
+    return df
+
 def preprocess_dataframe(df_name: str, df: pd.DataFrame) -> pd.DataFrame:
     """
     Parameters:
@@ -78,6 +97,10 @@ def preprocess_dataframe(df_name: str, df: pd.DataFrame) -> pd.DataFrame:
         preprocessed_df = preprocess_global_temperature(df=df)
     if df_name == 'ocean_warming':
         preprocessed_df = preprocess_ocean_warming(df=df)
+    if df_name == 'world_population':
+        preprocessed_df = preprocess_world_population(df=df)
+    if df_name == 'world_employment_rate':
+        preprocessed_df = preprocess_world_employment(df=df)
     return preprocessed_df
 
 
