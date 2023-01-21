@@ -66,6 +66,7 @@ def preprocess_ocean_warming(df: pd.DataFrame) -> pd.DataFrame:
 
 def preprocess_world_employment(df:pd.DataFrame) -> pd.DataFrame:
     df = df.groupby(by=['TIME']).mean().reset_index()
+    # Filter dataset for a constant time period from 1965 onwards
     df = df[df['TIME'] > 1964]
     df = df.rename(columns = {'TIME':'year'})
     df.insert(loc=1, column='month', value=12)
@@ -76,18 +77,9 @@ def preprocess_world_employment(df:pd.DataFrame) -> pd.DataFrame:
     return df
 
 def preprocess_energy_substitution(df:pd.DataFrame) -> pd.DataFrame:
-    column_list = ['Other renewables (TWh, substituted energy)',
-                   'Biofuels (TWh, substituted energy)',
-                    'Solar (TWh, substituted energy)',
-                   'Wind (TWh, substituted energy)',
-                   'Hydropower (TWh, substituted energy)',
-                   'Nuclear (TWh, substituted energy)',
-                   'Gas (TWh, substituted energy)',
-                   'Oil (TWh, substituted energy)',
-                   'Coal (TWh, substituted energy)',
-                   'Traditional biomass (TWh, substituted energy)']
-    df['global_energy_substitution'] = df[column_list].sum(axis=1)
+    df['global_energy_substitution'] = df.filter(like='substituted energy', axis=1).sum(axis=1)
     df = df[['Year', 'global_energy_substitution']]
+    # Filter dataset for a constant time period from 1965 onwards
     df = df[df['Year'] > 1964]
     df.insert(loc=1, column='month', value=12)
     df.insert(loc=2, column='day', value=31)
@@ -99,6 +91,7 @@ def preprocess_world_population(df:pd.DataFrame) -> pd.DataFrame:
     df.reset_index(inplace= True)
     df.rename(columns={' Population':'world_population'}, inplace=True)
     df.date = pd.to_datetime(df['date'])
+    # Filter dataset for a constant time period from 1965 onwards
     df = df[df['date'].dt.year > 1964]
     df = df[['date','world_population']]
     return df
