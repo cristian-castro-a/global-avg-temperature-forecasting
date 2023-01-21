@@ -61,6 +61,8 @@ def preprocess_ocean_warming(df: pd.DataFrame) -> pd.DataFrame:
     df.rename(columns={'index': 'date', 'NOAA': 'ocean_warming'}, inplace=True)
     df['date'] = pd.to_datetime(df['date'])
     return df
+
+
 def preprocess_renewable_energy_share(df: pd.DataFrame) -> pd.DataFrame:
     # Our World in Data already included BP's defined region.
     df = df[df['Entity'].str.contains( '(BP)' )==False]
@@ -72,6 +74,7 @@ def preprocess_renewable_energy_share(df: pd.DataFrame) -> pd.DataFrame:
     df.rename(columns={'date': 'date', 'Renewables (% equivalent primary energy)': 'renewable_energy_share'}, inplace=True)
     return df
 
+
 def preprocess_oil_consumption(df: pd.DataFrame) -> pd.DataFrame:
     # Our World in Data already included BP's defined region.
     df = df[df['Entity']=='World']
@@ -82,6 +85,7 @@ def preprocess_oil_consumption(df: pd.DataFrame) -> pd.DataFrame:
     df.drop(['Year','month','day'], axis=1, inplace=True)
     df.rename(columns={'date': 'date', 'Oil per capita (kWh)': 'oil_consumption_per_capita'}, inplace=True)
     return df
+
 
 def preprocess_dataframe(df_name: str, df: pd.DataFrame) -> pd.DataFrame:
     """
