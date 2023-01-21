@@ -12,3 +12,4 @@ datafiles:
   world_population: 'world_population.csv'
   oil_consumption_per_capita: 'oil_consumption_per_capita.csv'
   global_energy_substitution: 'global_energy_substitution.csv'
+  world_gdp: 'owid-co2-data.csv'
