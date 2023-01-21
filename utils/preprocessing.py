@@ -63,6 +63,38 @@ def preprocess_ocean_warming(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def preprocess_world_employment(df:pd.DataFrame) -> pd.DataFrame:
+    df = df.groupby(by=['TIME']).mean().reset_index()
+    # Filter dataset for a constant time period from 1965 onwards
+    df = df[df['TIME'] > 1964]
+    df = df.rename(columns = {'TIME':'year'})
+    df.insert(loc=1, column='month', value=12)
+    df.insert(loc=2, column='day', value=31)
+    df.insert(loc=0, column='date', value=pd.to_datetime(df[['year','month','day']]))
+    df.drop(['year','month','day'], axis=1, inplace=True)
+    df.rename(columns= {'Value':'world_employment_rate'}, inplace=True)
+    return df
+
+def preprocess_energy_substitution(df:pd.DataFrame) -> pd.DataFrame:
+    df['global_energy_substitution'] = df.filter(like='substituted energy', axis=1).sum(axis=1)
+    df = df[['Year', 'global_energy_substitution']]
+    # Filter dataset for a constant time period from 1965 onwards
+    df = df[df['Year'] > 1964]
+    df.insert(loc=1, column='month', value=12)
+    df.insert(loc=2, column='day', value=31)
+    df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year','month','day']]))
+    df.drop(['Year','month','day'], axis=1, inplace=True)
+    return df
+
+def preprocess_world_population(df:pd.DataFrame) -> pd.DataFrame:
+    df.reset_index(inplace= True)
+    df.rename(columns={' Population':'world_population'}, inplace=True)
+    df.date = pd.to_datetime(df['date'])
+    # Filter dataset for a constant time period from 1965 onwards
+    df = df[df['date'].dt.year > 1964]
+    df = df[['date','world_population']]
+    return df
+
 def preprocess_renewable_energy_share(df: pd.DataFrame) -> pd.DataFrame:
     # Our World in Data already included BP's defined region.
     df = df[df['Entity'].str.contains( '(BP)' )==False]
@@ -102,6 +134,12 @@ def preprocess_dataframe(df_name: str, df: pd.DataFrame) -> pd.DataFrame:
         preprocessed_df = preprocess_global_temperature(df=df)
     if df_name == 'ocean_warming':
         preprocessed_df = preprocess_ocean_warming(df=df)
+    if df_name == 'world_population':
+        preprocessed_df = preprocess_world_population(df=df)
+    if df_name == 'world_employment_rate':
+        preprocessed_df = preprocess_world_employment(df=df)
+    if df_name == 'global_energy_substitution':
+        preprocessed_df = preprocess_energy_substitution(df=df)
     if df_name == 'renewable_energy_share':
         preprocessed_df = preprocess_renewable_energy_share(df=df)
     if df_name == 'oil_consumption_per_capita':
