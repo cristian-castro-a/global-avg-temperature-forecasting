@@ -53,7 +53,6 @@ def preprocess_global_temperature(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-
 def preprocess_ocean_warming(df: pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=1, column='month', value=12)
     df.insert(loc=2, column='day', value=31)
@@ -96,6 +95,30 @@ def preprocess_world_population(df:pd.DataFrame) -> pd.DataFrame:
     df = df[['date','world_population']]
     return df
 
+def preprocess_renewable_energy_share(df: pd.DataFrame) -> pd.DataFrame:
+    # Our World in Data already included BP's defined region.
+    df = df[df['Entity'].str.contains( '(BP)' )==False]
+    df = df.groupby(by=['Year']).mean().reset_index()[['Year','Renewables (% equivalent primary energy)']]
+    df.insert(loc=1, column='month', value=12)
+    df.insert(loc=2, column='day', value=31)
+    df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year','month','day']]))
+    df.drop(['Year','month','day'], axis=1, inplace=True)
+    df.rename(columns={'date': 'date', 'Renewables (% equivalent primary energy)': 'renewable_energy_share'}, inplace=True)
+    return df
+
+
+def preprocess_oil_consumption(df: pd.DataFrame) -> pd.DataFrame:
+    # Our World in Data already included BP's defined region.
+    df = df[df['Entity']=='World']
+    df = df.groupby(by=['Year']).mean().reset_index()[['Year','Oil per capita (kWh)']]
+    df.insert(loc=1, column='month', value=12)
+    df.insert(loc=2, column='day', value=31)
+    df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year','month','day']]))
+    df.drop(['Year','month','day'], axis=1, inplace=True)
+    df.rename(columns={'date': 'date', 'Oil per capita (kWh)': 'oil_consumption_per_capita'}, inplace=True)
+    return df
+
+
 def preprocess_dataframe(df_name: str, df: pd.DataFrame) -> pd.DataFrame:
     """
     Parameters:
@@ -117,6 +140,10 @@ def preprocess_dataframe(df_name: str, df: pd.DataFrame) -> pd.DataFrame:
         preprocessed_df = preprocess_world_employment(df=df)
     if df_name == 'global_energy_substitution':
         preprocessed_df = preprocess_energy_substitution(df=df)
+    if df_name == 'renewable_energy_share':
+        preprocessed_df = preprocess_renewable_energy_share(df=df)
+    if df_name == 'oil_consumption_per_capita':
+        preprocessed_df = preprocess_oil_consumption(df=df)
     return preprocessed_df
 
 
