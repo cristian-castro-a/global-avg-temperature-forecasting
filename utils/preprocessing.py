@@ -75,6 +75,7 @@ def preprocess_world_employment(df:pd.DataFrame) -> pd.DataFrame:
     df.rename(columns= {'Value':'world_employment_rate'}, inplace=True)
     return df
 
+
 def preprocess_energy_substitution(df:pd.DataFrame) -> pd.DataFrame:
     df['global_energy_substitution'] = df.filter(like='substituted energy', axis=1).sum(axis=1)
     df = df[['Year', 'global_energy_substitution']]
@@ -86,6 +87,7 @@ def preprocess_energy_substitution(df:pd.DataFrame) -> pd.DataFrame:
     df.drop(['Year','month','day'], axis=1, inplace=True)
     return df
 
+
 def preprocess_world_population(df:pd.DataFrame) -> pd.DataFrame:
     df.reset_index(inplace= True)
     df.rename(columns={' Population':'world_population'}, inplace=True)
@@ -94,6 +96,7 @@ def preprocess_world_population(df:pd.DataFrame) -> pd.DataFrame:
     df = df[df['date'].dt.year > 1964]
     df = df[['date','world_population']]
     return df
+
 
 def preprocess_renewable_energy_share(df: pd.DataFrame) -> pd.DataFrame:
     # Our World in Data already included BP's defined region.
