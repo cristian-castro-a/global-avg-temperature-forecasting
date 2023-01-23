@@ -1,4 +1,5 @@
 from typing import Dict
+
 import pandas as pd
 
 
@@ -10,8 +11,8 @@ def check_correct_structures(processed_data_dict: Dict) -> Dict:
         Same dictionary after checking correct structures (Only two columns per dataframe, where one of them is 'date')
     """
     for df_name, df in processed_data_dict.items():
-        assert len(df.columns)==2, f"The {df_name} dataframe has more than two columns." \
-                                   f"Only two columns are allowed: 'date' and value of the predictor."
+        assert len(df.columns) == 2, f"The {df_name} dataframe has more than two columns." \
+                                     f"Only two columns are allowed: 'date' and value of the predictor."
         assert 'date' in df.columns, f"One column of the dataframe {df_name} must be named 'date'."
         assert df['date'].dtype == 'datetime64[ns]', f"Column 'date' of {df_name} should be datetime64 type."
     return processed_data_dict

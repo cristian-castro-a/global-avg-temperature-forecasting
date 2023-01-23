@@ -1,17 +1,44 @@
 import logging
 from typing import Dict, Tuple
 
-import pandas as pd
 import numpy as np
+import pandas as pd
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.preprocessing import MinMaxScaler, RobustScaler
 
 logger = logging.getLogger(__name__)
+
+
+class PredictorScaler(BaseEstimator, TransformerMixin):
+    """
+    Class that stores values of a given predictor and its scaler (MinMaxScaler or RobustScaler)
+    """
+    def __init__(self, scaler: str, feature_range: Tuple[int,int], variable_values: pd.DataFrame):
+        if scaler == 'MinMaxScaler':
+            self.scaler = MinMaxScaler(feature_range=feature_range)
+        elif scaler == 'RobustScaler':
+            self.scaler = RobustScaler()
+        else:
+            raise NameError("You can only choose between 'MinMaxScaler' and 'RobustScaler'")
+
+        self.variable_values = variable_values.values.reshape(-1, 1)
+
+    def fit(self):
+        self.scaler.fit(self.variable_values)
+        return self
+
+    def transform(self, variable_values: pd.DataFrame):
+        values_scaled = self.scaler.transform(variable_values.values.reshape(-1, 1))
+        return values_scaled
+
+    def fit_transform(self, variable_values: pd.DataFrame, y=None, **fit_params):
+        return self.fit().transform(variable_values.values.reshape(-1, 1))
 
 
 class Windowing:
     """
     Class to create fixed length sequences to train a LSTM Model
     """
-
     def __init__(self, df: pd.DataFrame):
         self.df = df
 
@@ -25,9 +52,9 @@ class Windowing:
         X = []
         y = []
 
-        for i in range(len(df_as_np) - window):
-            X.append([[a] for a in df_as_np[i:i + window]])
-            y.append(df_as_np[i + window])
+        for i in range(len(df_as_np)-window):
+            X.append([[a] for a in df_as_np[i:i+window]])
+            y.append(df_as_np[i+window])
 
         return np.array(X), np.array(y)
 
