@@ -5,7 +5,6 @@ from utils.plotting import plot_lines_by
 from pathlib import Path
 
 
-
 def check_correct_structures(processed_data_dict: Dict) -> Dict:
     """
     Parameters:
