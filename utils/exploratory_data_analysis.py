@@ -46,12 +46,31 @@ def get_eda_summary(processed_data_dict: Dict) -> pd.DataFrame:
     return pd.DataFrame.from_dict(summary, orient='index', columns=columns)
 
 
-def plot_time_series(processed_data_dict: Dict):
+def get_predictor_names(processed_data_dict: Dict):
     """
     Parameters:
         processed_data_dict: Dictionary of previously preprocessed time series data
     Returns:
-        Plots the times series
+        lift of predictor names
+    """
+    checked_data_dict = check_correct_structures(processed_data_dict=processed_data_dict)
+
+    predictor_names = []
+
+    for df_name, df in checked_data_dict.items():
+        predictor_name = [col for col in df.columns if 'date' not in col][0]
+        predictor_names.append(predictor_name)
+
+    return predictor_names
+
+
+def plot_time_series(processed_data_dict: Dict, predictor_names: list):
+    """
+    Parameters:
+        processed_data_dict: Dictionary of previously preprocessed time series data
+        predictor_names : a list of predictor names for each dataframe in the dictionary
+    Returns:
+        None but plots the times series
     """
     checked_data_dict = check_correct_structures(processed_data_dict=processed_data_dict)
 
@@ -60,15 +79,8 @@ def plot_time_series(processed_data_dict: Dict):
     # Iterate over the dictionary
     for i, (df_name, df) in enumerate(checked_data_dict.items()):
         # Plot the time series
-        df.plot(x='date', y='value', ax=axs[i])
+        df.plot(x='date', y=predictor_names[i], ax=axs[i])
         axs[i].set_title(df_name, fontsize=8)
     plt.show()
 
 
-def get_desc_stats(processed_data_dict: Dict) -> Dict:
-    checked_data_dict = check_correct_structures(processed_data_dict=processed_data_dict)
-
-    desc_stats = {}
-    for df_name, df in checked_data_dict.items():
-        desc_stats[df_name] = df.describe()
-    return desc_stats

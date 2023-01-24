@@ -40,9 +40,9 @@ def preprocess_co2_emissions(df: pd.DataFrame) -> pd.DataFrame:
     df.drop(['year', 'month', 'day'], axis=1, inplace=True)
     # To work with tonnes of co2 it is necessary a conversion factor of 3.664
     df['co2'] = df['co2'] / 3.664
-    df.rename(columns={'date': 'date', 'co2': 'value'}, inplace=True)
+    df.rename(columns={'date': 'date', 'co2': 'co2_emissions'}, inplace=True)
     df = df.loc[(df['date'] >= '1965-12-31') & (df['date'] <= '2019-12-31')]
-    df['value'] = df['value'].astype(float)
+    df['co2_emissions'] = df['co2_emissions'].astype(float)
     df.reset_index(drop=True, inplace=True)
     return df
 
@@ -52,9 +52,9 @@ def preprocess_global_temperature(df: pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=2, column='day', value=31)
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year', 'month', 'day']]))
     df.drop(['Year', 'month', 'day', 'Lowess(5)'], axis=1, inplace=True)
-    df.rename(columns={'date': 'date', 'No_Smoothing': 'value'}, inplace=True)
+    df.rename(columns={'date': 'date', 'No_Smoothing': 'global_temperature'}, inplace=True)
     df = df.loc[(df['date'] >= '1965-12-31') & (df['date'] <= '2019-12-31')]
-    df['value'] = df['value'].astype(float)
+    df['global_temperature'] = df['global_temperature'].astype(float)
     df.reset_index(drop=True, inplace=True)
     return df
 
@@ -64,10 +64,10 @@ def preprocess_ocean_warming(df: pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=2, column='day', value=31)
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year', 'month', 'day']]))
     df.drop([col for col in df.columns if col not in ('date', 'NOAA')], axis=1, inplace=True)
-    df.rename(columns={'index': 'date', 'NOAA': 'value'}, inplace=True)
+    df.rename(columns={'index': 'date', 'NOAA': 'ocean_warming'}, inplace=True)
     df['date'] = pd.to_datetime(df['date'])
     df = df.loc[(df['date'] >= '1965-12-31') & (df['date'] <= '2019-12-31')]
-    df['value'] = df['value'].astype(float)
+    df['ocean_warming'] = df['ocean_warming'].astype(float)
     df.reset_index(drop=True, inplace=True)
     return df
 
@@ -81,9 +81,9 @@ def preprocess_world_employment(df:pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=2, column='day', value=31)
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['year','month','day']]))
     df.drop(['year','month','day'], axis=1, inplace=True)
-    df.rename(columns= {'Value':'value'}, inplace=True)
+    df.rename(columns= {'Value':'world_employment_rate'}, inplace=True)
     df = df.loc[(df['date'] >= '1965-12-31') & (df['date'] <= '2019-12-31')]
-    df['value'] = df['value'].astype(float)
+    df['world_employment_rate'] = df['world_employment_rate'].astype(float)
     df.reset_index(drop=True, inplace=True)
     return df
 
@@ -97,9 +97,8 @@ def preprocess_energy_substitution(df:pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=2, column='day', value=31)
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year','month','day']]))
     df.drop(['Year','month','day'], axis=1, inplace=True)
-    df.rename(columns={'global_energy_substitution': 'value'}, inplace=True)
     df = df.loc[(df['date'] >= '1965-12-31') & (df['date'] <= '2019-12-31')]
-    df['value'] = df['value'].astype(float)
+    df['global_energy_substitution'] = df['global_energy_substitution'].astype(float)
     df.reset_index(drop=True, inplace=True)
     return df
 
@@ -111,9 +110,8 @@ def preprocess_world_population(df:pd.DataFrame) -> pd.DataFrame:
     # Filter dataset for a constant time period from 1965 onwards
     df = df[df['date'].dt.year > 1964]
     df = df[['date','world_population']]
-    df.rename(columns={'world_population': 'value'}, inplace=True)
     df = df.loc[(df['date'] >= '1965-12-31') & (df['date'] <= '2019-12-31')]
-    df['value'] = df['value'].astype(float)
+    df['world_population'] = df['world_population'].astype(float)
     df.reset_index(drop=True, inplace=True)
     return df
 
@@ -126,10 +124,10 @@ def preprocess_renewable_energy_share(df: pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=2, column='day', value=31)
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year', 'month', 'day']]))
     df.drop(['Year', 'month', 'day'], axis=1, inplace=True)
-    df.rename(columns={'date': 'date', 'Renewables (% equivalent primary energy)': 'value'},
+    df.rename(columns={'date': 'date', 'Renewables (% equivalent primary energy)': 'renewable_energy_share'},
               inplace=True)
     df = df.loc[(df['date'] >= '1965-12-31') & (df['date'] <= '2019-12-31')]
-    df['value'] = df['value'].astype(float)
+    df['renewable_energy_share'] = df['renewable_energy_share'].astype(float)
     df.reset_index(drop=True, inplace=True)
     return df
 
@@ -142,9 +140,9 @@ def preprocess_oil_consumption(df: pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=2, column='day', value=31)
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year', 'month', 'day']]))
     df.drop(['Year', 'month', 'day'], axis=1, inplace=True)
-    df.rename(columns={'date': 'date', 'Oil per capita (kWh)': 'value'}, inplace=True)
+    df.rename(columns={'date': 'date', 'Oil per capita (kWh)': 'oil_consumption_per_capita'}, inplace=True)
     df = df.loc[(df['date'] >= '1965-12-31') & (df['date'] <= '2019-12-31')]
-    df['value'] = df['value'].astype(float)
+    df['oil_consumption_per_capita'] = df['oil_consumption_per_capita'].astype(float)
     df.reset_index(drop=True, inplace=True)
     return df
 
@@ -155,9 +153,9 @@ def preprocess_world_gdp(df: pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=2, column='day', value=31)
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['year', 'month', 'day']]))
     df.drop(['year', 'month', 'day'], axis=1, inplace=True)
-    df.rename(columns={'date': 'date', 'gdp': 'value'}, inplace=True)
+    df.rename(columns={'date': 'date', 'gdp': 'world_gdp'}, inplace=True)
     df = df.loc[(df['date'] >= '1965-12-31') & (df['date'] <= '2019-12-31')]
-    df['value'] = df['value'].astype(float)
+    df['world_gdp'] = df['world_gdp'].astype(float)
     df.reset_index(drop=True, inplace=True)
     return df
 
