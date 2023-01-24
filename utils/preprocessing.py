@@ -4,7 +4,7 @@ from typing import Dict, Tuple
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.preprocessing import MinMaxScaler, RobustScaler
+from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
 
 logger = logging.getLogger(__name__)
 
@@ -13,13 +13,15 @@ class PredictorScaler(BaseEstimator, TransformerMixin):
     """
     Class that stores values of a given predictor and its scaler (MinMaxScaler or RobustScaler)
     """
-    def __init__(self, scaler: str, feature_range: Tuple[int,int], variable_values: pd.DataFrame):
+    def __init__(self, scaler: str, variable_values: pd.DataFrame, feature_range: Tuple[int,int] = None):
         if scaler == 'MinMaxScaler':
             self.scaler = MinMaxScaler(feature_range=feature_range)
+        elif scaler == 'StandardScaler':
+            self.scaler = StandardScaler()
         elif scaler == 'RobustScaler':
             self.scaler = RobustScaler()
         else:
-            raise NameError("You can only choose between 'MinMaxScaler' and 'RobustScaler'")
+            raise NameError("You can only choose between 'MinMaxScaler', 'RobustScaler' and 'StandardScaler'")
 
         self.variable_values = variable_values.values.reshape(-1, 1)
 
@@ -37,12 +39,24 @@ class PredictorScaler(BaseEstimator, TransformerMixin):
 
 class Windowing:
     """
-    Class to create fixed length sequences to train a LSTM Model
+    Class to create fixed length sequences to train LSTM Models
     """
-    def __init__(self, df: pd.DataFrame):
+    def __init__(self, df: pd.DataFrame, mode: str):
         self.df = df
+        if mode == 'Univariate':
+            self.mode = 'univariate'
+        elif mode == 'Multivariate':
+            self.mode = 'multivariate'
+        else:
+            raise NameError("Mode can be 'Univariate' or 'Multivariate'")
 
-    def get_input_sequences(self, on_column: str, window: int = 5) -> Tuple[np.array, np.array]:
+    def get_input_sequences(self, on_column: str, window: int = 5, target: str = None) -> Tuple[np.array, np.array]:
+        if self.mode == 'univariate':
+            return self._get_univariate_sequences(on_column=on_column, window=window)
+        elif self.mode == 'multivariate':
+            pass
+
+    def _get_univariate_sequences(self, on_column: str, window: int = 5) -> Tuple[np.array, np.array]:
         assert isinstance(window, int), f" 'Window' is expected to be an integer, but got {type(window)}."
         assert isinstance(on_column, str), f" 'On_column' is expected to be a string, but got {type(on_column)}."
         assert on_column in self.df.columns, f" {on_column} is not a column in the dataframe."
