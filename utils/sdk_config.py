@@ -13,6 +13,7 @@ class SDKConfig:
         self.base_model_dir = self.models_dir / 'base_model'
         self.univar_lstm_dir = self.models_dir / 'univar_lstm_model'
         self.multivar_lstm_dir = self.models_dir / 'multivar_lstm_model'
+        self.forecasting_dir = self.root_dir / 'forecasting'
         self.tmp_dir = self.root_dir / 'tmp'
 
     def get_output_dir(self, output_dir: str) -> Path:
