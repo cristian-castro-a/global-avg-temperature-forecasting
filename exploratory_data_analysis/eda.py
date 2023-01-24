@@ -25,7 +25,7 @@ def main(config: DictConfig) -> None:
 
     # Visualization of predictors and summary of statistics
     path_to_results = SDKConfig().get_output_dir("plots_predictors")
-    plot_time_series(processed_data_dict, path_to_results)
+    plot_time_series(processed_data_dict=processed_data_dict, path_to_results=path_to_results)
     eda_summary = get_eda_summary(processed_data_dict=processed_data_dict)
 
 
