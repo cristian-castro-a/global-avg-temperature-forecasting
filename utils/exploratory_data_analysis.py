@@ -1,6 +1,9 @@
 from typing import Dict
 import pandas as pd
 import matplotlib.pyplot as plt
+from pathlib import Path
+from utils.plotting import plot_lines_by
+
 
 
 def check_correct_structures(processed_data_dict: Dict) -> Dict:
@@ -84,3 +87,19 @@ def plot_time_series(processed_data_dict: Dict, predictor_names: list):
     plt.show()
 
 
+def plot_time_series(processed_data_dict: Dict, predictor_names: list, path_to_results: Path):
+    """
+    Parameters:
+        processed_data_dict: Dictionary of previously preprocessed time series data
+        predictor_names : a list of predictor names for each dataframe in the dictionary
+        path_to_results: the path where to store the results in .html
+    Returns:
+        None but plots the times series
+    """
+    checked_data_dict = check_correct_structures(processed_data_dict=processed_data_dict)
+
+    # Iterate over the dictionary
+    for i, (df_name, df) in enumerate(checked_data_dict.items()):
+        file_name = df_name + ".html"
+        plot_lines_by(data=df, plot_x='date', plot_y=predictor_names[i], path_to_results=path_to_results,
+                      file_name=file_name)
