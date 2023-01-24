@@ -48,29 +48,10 @@ def get_eda_summary(processed_data_dict: Dict) -> pd.DataFrame:
     return pd.DataFrame.from_dict(summary, orient='index', columns=columns)
 
 
-def get_predictor_names(processed_data_dict: Dict):
+def plot_time_series(processed_data_dict: Dict, path_to_results: Path):
     """
     Parameters:
         processed_data_dict: Dictionary of previously preprocessed time series data
-    Returns:
-        lift of predictor names
-    """
-    checked_data_dict = check_correct_structures(processed_data_dict=processed_data_dict)
-
-    predictor_names = []
-
-    for df_name, df in checked_data_dict.items():
-        predictor_name = [col for col in df.columns if 'date' not in col][0]
-        predictor_names.append(predictor_name)
-
-    return predictor_names
-
-
-def plot_time_series(processed_data_dict: Dict, predictor_names: list, path_to_results: Path):
-    """
-    Parameters:
-        processed_data_dict: Dictionary of previously preprocessed time series data
-        predictor_names : a list of predictor names for each dataframe in the dictionary
         path_to_results: the path where to store the results in .html
     Returns:
         None but plots the times series
@@ -78,7 +59,7 @@ def plot_time_series(processed_data_dict: Dict, predictor_names: list, path_to_r
     checked_data_dict = check_correct_structures(processed_data_dict=processed_data_dict)
 
     # Iterate over the dictionary
-    for i, (df_name, df) in enumerate(checked_data_dict.items()):
+    for df_name, df in checked_data_dict.items():
         file_name = df_name + ".html"
-        plot_lines_by(data=df, plot_x='date', plot_y=predictor_names[i], path_to_results=path_to_results,
+        plot_lines_by(data=df, plot_x='date', plot_y=df_name, path_to_results=path_to_results,
                       file_name=file_name)
