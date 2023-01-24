@@ -3,7 +3,7 @@ import logging
 import hydra
 from omegaconf import DictConfig
 
-from utils.exploratory_data_analysis import get_eda_summary, get_predictor_names, plot_time_series
+from utils.exploratory_data_analysis import get_eda_summary, plot_time_series
 from utils.parsers import read_data
 from utils.preprocessing import preprocess_data
 from utils.sdk_config import SDKConfig
