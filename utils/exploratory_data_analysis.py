@@ -1,6 +1,9 @@
 from typing import Dict
 
 import pandas as pd
+from utils.plotting import plot_lines_by
+from pathlib import Path
+
 
 
 def check_correct_structures(processed_data_dict: Dict) -> Dict:
@@ -44,3 +47,20 @@ def get_eda_summary(processed_data_dict: Dict) -> pd.DataFrame:
         summary[df_name] = results
 
     return pd.DataFrame.from_dict(summary, orient='index', columns=columns)
+
+
+def plot_time_series(processed_data_dict: Dict, path_to_results: Path):
+    """
+    Parameters:
+        processed_data_dict: Dictionary of previously preprocessed time series data
+        path_to_results: the path where to store the results in .html
+    Returns:
+        None but plots the times series
+    """
+    checked_data_dict = check_correct_structures(processed_data_dict=processed_data_dict)
+
+    # Iterate over the dictionary
+    for df_name, df in checked_data_dict.items():
+        file_name = df_name + ".html"
+        plot_lines_by(data=df, plot_x='date', plot_y=df_name, path_to_results=path_to_results,
+                      file_name=file_name)
