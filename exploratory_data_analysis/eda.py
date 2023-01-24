@@ -3,7 +3,7 @@ import logging
 import hydra
 from omegaconf import DictConfig
 
-from utils.exploratory_data_analysis import get_eda_summary
+from utils.exploratory_data_analysis import get_eda_summary, get_predictor_names, plot_time_series
 from utils.parsers import read_data
 from utils.preprocessing import preprocess_data
 from utils.sdk_config import SDKConfig
@@ -19,6 +19,12 @@ def main(config: DictConfig) -> None:
     """
     data_dict = read_data(data_dir=SDKConfig().data_dir, config=config)
     processed_data_dict = preprocess_data(data_dict=data_dict)
+
+    # Visualization of predictors
+    predictor_names = get_predictor_names(processed_data_dict=processed_data_dict)
+    sdk_config = SDKConfig()
+    path_to_results = sdk_config.get_output_dir("plots_predictors")
+    plot_time_series(processed_data_dict, predictor_names, path_to_results)
 
     eda_summary = get_eda_summary(processed_data_dict=processed_data_dict)
 
