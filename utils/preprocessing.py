@@ -151,12 +151,11 @@ def preprocess_oil_consumption(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def preprocess_world_gdp(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.groupby(by=['year']).sum().reset_index()[['year', 'gdp']]
     df.insert(loc=1, column='month', value=12)
     df.insert(loc=2, column='day', value=31)
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['year', 'month', 'day']]))
     df.drop(['year', 'month', 'day'], axis=1, inplace=True)
-    df.rename(columns={'date': 'date', 'gdp': 'world_gdp'}, inplace=True)
+    df.rename(columns={'date': 'date', 'mean_gdp': 'world_gdp'}, inplace=True)
     return df
 
 
