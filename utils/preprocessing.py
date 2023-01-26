@@ -13,17 +13,21 @@ class PredictorScaler(BaseEstimator, TransformerMixin):
     """
     Class that stores values of a given predictor and its scaler (MinMaxScaler or RobustScaler)
     """
-    def __init__(self, scaler: str, variable_values: pd.DataFrame, feature_range: Tuple[int,int] = None):
-        if scaler == 'MinMaxScaler':
+    def __init__(self, scaler: str, variable_values: pd.Series, feature_range: Tuple[int,int] = None):
+        self.name_scaler = scaler
+        self.variable_values = variable_values.values.reshape(-1, 1)
+
+        if self.name_scaler == 'MinMaxScaler':
             self.scaler = MinMaxScaler(feature_range=feature_range)
-        elif scaler == 'StandardScaler':
+        elif self.name_scaler == 'StandardScaler':
             self.scaler = StandardScaler()
-        elif scaler == 'RobustScaler':
+        elif self.name_scaler == 'RobustScaler':
             self.scaler = RobustScaler()
         else:
             raise NameError("You can only choose between 'MinMaxScaler', 'RobustScaler' and 'StandardScaler'")
 
-        self.variable_values = variable_values.values.reshape(-1, 1)
+    def __post_init__(self):
+        logger.info(f"Initialized {self.name_scaler}")
 
     def fit(self):
         self.scaler.fit(self.variable_values)
@@ -39,10 +43,11 @@ class PredictorScaler(BaseEstimator, TransformerMixin):
 
 class Windowing:
     """
-    Class to create fixed length sequences to train LSTM Models
+    Class to create fixed length sequences to train LSTM Models (Univariate or Multivariate)
     """
     def __init__(self, df: pd.DataFrame, mode: str):
         self.df = df
+
         if mode == 'Univariate':
             self.mode = 'univariate'
         elif mode == 'Multivariate':
@@ -50,11 +55,11 @@ class Windowing:
         else:
             raise NameError("Mode can be 'Univariate' or 'Multivariate'")
 
-    def get_input_sequences(self, on_column: str, window: int = 5, target: str = None) -> Tuple[np.array, np.array]:
+    def get_input_sequences(self, window: int = 5, on_column: str = None, target: str = None) -> Tuple[np.array, np.array]:
         if self.mode == 'univariate':
             return self._get_univariate_sequences(on_column=on_column, window=window)
         elif self.mode == 'multivariate':
-            pass
+            return self._get_multivariate_sequences(window=window, target=target)
 
     def _get_univariate_sequences(self, on_column: str, window: int = 5) -> Tuple[np.array, np.array]:
         assert isinstance(window, int), f" 'Window' is expected to be an integer, but got {type(window)}."
@@ -71,6 +76,12 @@ class Windowing:
             y.append(df_as_np[i+window])
 
         return np.array(X), np.array(y)
+
+    def _get_multivariate_sequences(self, window: int, target: str) -> Tuple[np.array, np.array]:
+        X = []
+        y = []
+
+        return X, y
 
 
 def preprocess_co2_emissions(df: pd.DataFrame) -> pd.DataFrame:
