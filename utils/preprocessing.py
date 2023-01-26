@@ -57,9 +57,9 @@ class Windowing:
         logger.info(f"Initialized an {self.mode} Windowing Class")
 
     def get_input_sequences(self, window: int = 5, on_column: str = None, target: str = None) -> Tuple[np.array, np.array]:
-        if self.mode == 'univariate':
+        if self.mode == 'Univariate':
             return self._get_univariate_sequences(on_column=on_column, window=window)
-        elif self.mode == 'multivariate':
+        elif self.mode == 'Multivariate':
             return self._get_multivariate_sequences(window=window, target=target)
 
     def _get_univariate_sequences(self, on_column: str, window: int = 5) -> Tuple[np.array, np.array]:
@@ -72,9 +72,9 @@ class Windowing:
         X = []
         y = []
 
-        for i in range(len(df_as_np)-window):
-            X.append([[a] for a in df_as_np[i:i+window]])
-            y.append(df_as_np[i+window])
+        for increment in range(len(df_as_np)-window):
+            X.append([[a] for a in df_as_np[increment:increment+window]])
+            y.append(df_as_np[increment+window])
 
         return np.array(X), np.array(y)
 
@@ -83,10 +83,21 @@ class Windowing:
         assert isinstance(target, str), f" 'Target' is expected to be a string, but got {type(target)}."
         assert target in self.df.columns, f" {target} is not a column in the dataframe."
 
-        df_as_np = self.df.to_numpy()
+        # Transform the dataframe to a pd.Series and keep a dictionary with column names and indexes
+        df_copy = self.df.copy()
+        df_copy = df_copy.loc[:, df_copy.columns != 'date']
+
+        column_dict = {k: v for v, k in enumerate(df_copy.columns)}
+        df_as_np = df_copy.to_numpy()
 
         X = []
         y = []
+
+        target_index = column_dict[target]
+
+        for increment in range(len(df_as_np)-window):
+            X.append([[[[df_as_np[i][j]] for i in range(increment, increment+window)] for j in range(df_as_np.shape[1])]])
+            y.append(df_as_np[increment+window][target_index])
 
         return X, y
 
