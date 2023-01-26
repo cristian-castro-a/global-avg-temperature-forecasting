@@ -68,6 +68,9 @@ def preprocess_co2_emissions(df: pd.DataFrame) -> pd.DataFrame:
     # To work with tonnes of co2 it is necessary a conversion factor of 3.664
     df['co2'] = df['co2'] / 3.664
     df.rename(columns={'date': 'date', 'co2': 'co2_emissions'}, inplace=True)
+    df.to_pickle("./co2_emission")
+    # Filter dataset for a constant time period from 1965 onwards till 2019
+    df = df[(df['date'].dt.year > 1964) & (df['date'].dt.year < 2020)]
     return df
 
 
@@ -77,6 +80,9 @@ def preprocess_global_temperature(df: pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year', 'month', 'day']]))
     df.drop(['Year', 'month', 'day', 'Lowess(5)'], axis=1, inplace=True)
     df.rename(columns={'date': 'date', 'No_Smoothing': 'global_temperature'}, inplace=True)
+    df.to_pickle("./global_temperature")
+    # Filter dataset for a constant time period from 1965 onwards till 2019
+    df = df[(df['date'].dt.year > 1964) & (df['date'].dt.year < 2020)]
     return df
 
 
@@ -87,31 +93,35 @@ def preprocess_ocean_warming(df: pd.DataFrame) -> pd.DataFrame:
     df.drop([col for col in df.columns if col not in ('date', 'NOAA')], axis=1, inplace=True)
     df.rename(columns={'index': 'date', 'NOAA': 'ocean_warming'}, inplace=True)
     df['date'] = pd.to_datetime(df['date'])
+    df.to_pickle("./ocean_warming")
+    # Filter dataset for a constant time period from 1965 onwards till 2019
+    df = df[(df['date'].dt.year > 1964) & (df['date'].dt.year < 2020)]
     return df
 
 
 def preprocess_world_employment(df:pd.DataFrame) -> pd.DataFrame:
     df = df.groupby(by=['TIME']).mean().reset_index()
-    # Filter dataset for a constant time period from 1965 onwards
-    df = df[df['TIME'] > 1964]
-    df = df.rename(columns = {'TIME':'year'})
+    df.rename(columns={'TIME':'year' , 'Value': 'world_employment_rate'}, inplace=True)
     df.insert(loc=1, column='month', value=12)
     df.insert(loc=2, column='day', value=31)
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['year','month','day']]))
     df.drop(['year','month','day'], axis=1, inplace=True)
-    df.rename(columns= {'Value':'world_employment_rate'}, inplace=True)
+    df.to_pickle("./world_employment")
+    # Filter dataset for a constant time period from 1965 onwards till 2019
+    df=df[(df['date'].dt.year > 1964) & (df['date'].dt.year < 2020)]
     return df
 
 
 def preprocess_energy_substitution(df:pd.DataFrame) -> pd.DataFrame:
     df['global_energy_substitution'] = df.filter(like='substituted energy', axis=1).sum(axis=1)
     df = df[['Year', 'global_energy_substitution']]
-    # Filter dataset for a constant time period from 1965 onwards
-    df = df[df['Year'] > 1964]
     df.insert(loc=1, column='month', value=12)
     df.insert(loc=2, column='day', value=31)
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year','month','day']]))
     df.drop(['Year','month','day'], axis=1, inplace=True)
+    df.to_pickle("./energy_substitution")
+    # Filter dataset for a constant time period from 1965 onwards till 2019
+    df = df[(df['date'].dt.year > 1964) & (df['date'].dt.year < 2020)]
     return df
 
 
@@ -119,9 +129,10 @@ def preprocess_world_population(df:pd.DataFrame) -> pd.DataFrame:
     df.reset_index(inplace= True)
     df.rename(columns={' Population':'world_population'}, inplace=True)
     df.date = pd.to_datetime(df['date'])
-    # Filter dataset for a constant time period from 1965 onwards
-    df = df[df['date'].dt.year > 1964]
     df = df[['date','world_population']]
+    df.to_pickle("./world_population")
+    # Filter dataset for a constant time period from 1965 onwards till 2019
+    df = df[(df['date'].dt.year > 1964) & (df['date'].dt.year < 2020)]
     return df
 
 
@@ -135,6 +146,9 @@ def preprocess_renewable_energy_share(df: pd.DataFrame) -> pd.DataFrame:
     df.drop(['Year', 'month', 'day'], axis=1, inplace=True)
     df.rename(columns={'date': 'date', 'Renewables (% equivalent primary energy)': 'renewable_energy_share'},
               inplace=True)
+    df.to_pickle("./renewable_energy_share")
+    # Filter dataset for a constant time period from 1965 onwards till 2019
+    df = df[(df['date'].dt.year > 1964) & (df['date'].dt.year < 2020)]
     return df
 
 
@@ -147,6 +161,9 @@ def preprocess_oil_consumption(df: pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year', 'month', 'day']]))
     df.drop(['Year', 'month', 'day'], axis=1, inplace=True)
     df.rename(columns={'date': 'date', 'Oil per capita (kWh)': 'oil_consumption_per_capita'}, inplace=True)
+    df.to_pickle("./oil_consumption")
+    # Filter dataset for a constant time period from 1965 onwards till 2019
+    df = df[(df['date'].dt.year > 1964) & (df['date'].dt.year < 2020)]
     return df
 
 
@@ -156,6 +173,9 @@ def preprocess_world_gdp(df: pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['year', 'month', 'day']]))
     df.drop(['year', 'month', 'day'], axis=1, inplace=True)
     df.rename(columns={'date': 'date', 'mean_gdp': 'world_gdp'}, inplace=True)
+    df.to_pickle("./world_gdp")
+    # Filter dataset for a constant time period from 1965 onwards till 2019
+    df = df[(df['date'].dt.year > 1964) & (df['date'].dt.year < 2020)]
     return df
 
 
