@@ -78,6 +78,12 @@ class Windowing:
         return np.array(X), np.array(y)
 
     def _get_multivariate_sequences(self, window: int, target: str) -> Tuple[np.array, np.array]:
+        assert isinstance(window, int), f" 'Window' is expected to be an integer, but got {type(window)}."
+        assert isinstance(target, str), f" 'Target' is expected to be a string, but got {type(target)}."
+        assert target in self.df.columns, f" {target} is not a column in the dataframe."
+
+        df_as_np = self.df.to_numpy()
+
         X = []
         y = []
 
