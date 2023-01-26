@@ -2,9 +2,10 @@ import logging
 
 import hydra
 from omegaconf import DictConfig
+import pandas as pd
 
 from utils.parsers import read_data
-from utils.preprocessing import preprocess_data
+from utils.preprocessing import preprocess_data, Windowing
 from utils.sdk_config import SDKConfig
 
 
@@ -21,6 +22,11 @@ def main(config: DictConfig) -> None:
 
     data_dict = read_data(data_dir=SDKConfig().data_dir, config=config)
     processed_data_dict = preprocess_data(data_dict=data_dict)
+
+    df_test = pd.merge(processed_data_dict['global_temperature'], processed_data_dict['co2_emissions'], on='date')
+    window_test = Windowing(df=df_test, mode='Multivariate')
+
+
     print('test')
 
 

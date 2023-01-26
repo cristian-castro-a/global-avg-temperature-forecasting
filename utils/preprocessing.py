@@ -26,7 +26,6 @@ class PredictorScaler(BaseEstimator, TransformerMixin):
         else:
             raise NameError("You can only choose between 'MinMaxScaler', 'RobustScaler' and 'StandardScaler'")
 
-    def __post_init__(self):
         logger.info(f"Initialized {self.name_scaler}")
 
     def fit(self):
@@ -49,11 +48,13 @@ class Windowing:
         self.df = df
 
         if mode == 'Univariate':
-            self.mode = 'univariate'
+            self.mode = 'Univariate'
         elif mode == 'Multivariate':
-            self.mode = 'multivariate'
+            self.mode = 'Multivariate'
         else:
             raise NameError("Mode can be 'Univariate' or 'Multivariate'")
+
+        logger.info(f"Initialized an {self.mode} Windowing Class")
 
     def get_input_sequences(self, window: int = 5, on_column: str = None, target: str = None) -> Tuple[np.array, np.array]:
         if self.mode == 'univariate':
