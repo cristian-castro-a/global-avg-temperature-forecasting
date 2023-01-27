@@ -7,7 +7,8 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import MinMaxScaler, RobustScaler
 
 logger = logging.getLogger(__name__)
-
+year_initial = 1965
+year_end = 2019
 
 class PredictorScaler(BaseEstimator, TransformerMixin):
     """
@@ -70,7 +71,7 @@ def preprocess_co2_emissions(df: pd.DataFrame) -> pd.DataFrame:
     df.rename(columns={'date': 'date', 'co2': 'co2_emissions'}, inplace=True)
     df.to_pickle("./co2_emission")
     # Filter dataset for a constant time period from 1965 onwards till 2019
-    df = df[(df['date'].dt.year > 1964) & (df['date'].dt.year < 2020)]
+    df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
 
 
@@ -82,7 +83,7 @@ def preprocess_global_temperature(df: pd.DataFrame) -> pd.DataFrame:
     df.rename(columns={'date': 'date', 'No_Smoothing': 'global_temperature'}, inplace=True)
     df.to_pickle("./global_temperature")
     # Filter dataset for a constant time period from 1965 onwards till 2019
-    df = df[(df['date'].dt.year > 1964) & (df['date'].dt.year < 2020)]
+    df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
 
 
@@ -95,7 +96,7 @@ def preprocess_ocean_warming(df: pd.DataFrame) -> pd.DataFrame:
     df['date'] = pd.to_datetime(df['date'])
     df.to_pickle("./ocean_warming")
     # Filter dataset for a constant time period from 1965 onwards till 2019
-    df = df[(df['date'].dt.year > 1964) & (df['date'].dt.year < 2020)]
+    df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
 
 
@@ -108,7 +109,7 @@ def preprocess_world_employment(df:pd.DataFrame) -> pd.DataFrame:
     df.drop(['year','month','day'], axis=1, inplace=True)
     df.to_pickle("./world_employment")
     # Filter dataset for a constant time period from 1965 onwards till 2019
-    df=df[(df['date'].dt.year > 1964) & (df['date'].dt.year < 2020)]
+    df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
 
 
@@ -121,7 +122,7 @@ def preprocess_energy_substitution(df:pd.DataFrame) -> pd.DataFrame:
     df.drop(['Year','month','day'], axis=1, inplace=True)
     df.to_pickle("./energy_substitution")
     # Filter dataset for a constant time period from 1965 onwards till 2019
-    df = df[(df['date'].dt.year > 1964) & (df['date'].dt.year < 2020)]
+    df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
 
 
@@ -132,7 +133,7 @@ def preprocess_world_population(df:pd.DataFrame) -> pd.DataFrame:
     df = df[['date','world_population']]
     df.to_pickle("./world_population")
     # Filter dataset for a constant time period from 1965 onwards till 2019
-    df = df[(df['date'].dt.year > 1964) & (df['date'].dt.year < 2020)]
+    df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
 
 
@@ -148,7 +149,7 @@ def preprocess_renewable_energy_share(df: pd.DataFrame) -> pd.DataFrame:
               inplace=True)
     df.to_pickle("./renewable_energy_share")
     # Filter dataset for a constant time period from 1965 onwards till 2019
-    df = df[(df['date'].dt.year > 1964) & (df['date'].dt.year < 2020)]
+    df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
 
 
@@ -163,7 +164,7 @@ def preprocess_oil_consumption(df: pd.DataFrame) -> pd.DataFrame:
     df.rename(columns={'date': 'date', 'Oil per capita (kWh)': 'oil_consumption_per_capita'}, inplace=True)
     df.to_pickle("./oil_consumption")
     # Filter dataset for a constant time period from 1965 onwards till 2019
-    df = df[(df['date'].dt.year > 1964) & (df['date'].dt.year < 2020)]
+    df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
 
 
@@ -175,7 +176,7 @@ def preprocess_world_gdp(df: pd.DataFrame) -> pd.DataFrame:
     df.rename(columns={'date': 'date', 'mean_gdp': 'world_gdp'}, inplace=True)
     df.to_pickle("./world_gdp")
     # Filter dataset for a constant time period from 1965 onwards till 2019
-    df = df[(df['date'].dt.year > 1964) & (df['date'].dt.year < 2020)]
+    df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
 
 
