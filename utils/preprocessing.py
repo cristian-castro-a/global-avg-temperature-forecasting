@@ -3,12 +3,12 @@ from typing import Dict, Tuple
 
 import numpy as np
 import pandas as pd
+from omegaconf import DictConfig
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import MinMaxScaler, RobustScaler
 
 logger = logging.getLogger(__name__)
-year_initial = 1965
-year_end = 2019
+
 
 class PredictorScaler(BaseEstimator, TransformerMixin):
     """
@@ -210,16 +210,21 @@ def preprocess_dataframe(df_name: str, df: pd.DataFrame) -> pd.DataFrame:
     return preprocessed_df
 
 
-def preprocess_data(data_dict: Dict) -> Dict:
+def preprocess_data(data_dict: Dict, config: DictConfig) -> Dict:
     """
     Parameters:
         data_dict: Dictionary with dataframes (each of which to be preprocessed differently)
+        config : Config file for variables
     Returns:
         Dictionary of preprocessed dataframes
     """
     processed_data_dict = {}
     logger.info('Preprocessing dataframes')
+    global year_initial, year_end
+    year_initial = config['timeframes'].get('year_initial')
+    year_end = config['timeframes'].get('year_end')
     for df_name, df in data_dict.items():
         logger.info(f'Preprocessing dataframe: {df_name}')
         processed_data_dict[df_name] = preprocess_dataframe(df_name=df_name, df=df)
+
     return processed_data_dict
