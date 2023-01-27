@@ -4,7 +4,7 @@ from typing import Dict, Tuple
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.preprocessing import MinMaxScaler, RobustScaler
+from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
 
 logger = logging.getLogger(__name__)
 
@@ -13,15 +13,20 @@ class PredictorScaler(BaseEstimator, TransformerMixin):
     """
     Class that stores values of a given predictor and its scaler (MinMaxScaler or RobustScaler)
     """
-    def __init__(self, scaler: str, feature_range: Tuple[int,int], variable_values: pd.DataFrame):
-        if scaler == 'MinMaxScaler':
+    def __init__(self, scaler: str, variable_values: pd.Series, feature_range: Tuple[int,int] = None):
+        self.name_scaler = scaler
+        self.variable_values = variable_values.values.reshape(-1, 1)
+
+        if self.name_scaler == 'MinMaxScaler':
             self.scaler = MinMaxScaler(feature_range=feature_range)
-        elif scaler == 'RobustScaler':
+        elif self.name_scaler == 'StandardScaler':
+            self.scaler = StandardScaler()
+        elif self.name_scaler == 'RobustScaler':
             self.scaler = RobustScaler()
         else:
-            raise NameError("You can only choose between 'MinMaxScaler' and 'RobustScaler'")
+            raise NameError("You can only choose between 'MinMaxScaler', 'RobustScaler' and 'StandardScaler'")
 
-        self.variable_values = variable_values.values.reshape(-1, 1)
+        logger.info(f"Initialized {self.name_scaler}")
 
     def fit(self):
         self.scaler.fit(self.variable_values)
@@ -37,12 +42,27 @@ class PredictorScaler(BaseEstimator, TransformerMixin):
 
 class Windowing:
     """
-    Class to create fixed length sequences to train a LSTM Model
+    Class to create fixed length sequences to train LSTM Models (Univariate or Multivariate)
     """
-    def __init__(self, df: pd.DataFrame):
+    def __init__(self, df: pd.DataFrame, mode: str):
         self.df = df
 
-    def get_input_sequences(self, on_column: str, window: int = 5) -> Tuple[np.array, np.array]:
+        if mode == 'Univariate':
+            self.mode = 'Univariate'
+        elif mode == 'Multivariate':
+            self.mode = 'Multivariate'
+        else:
+            raise NameError("Mode can be 'Univariate' or 'Multivariate'")
+
+        logger.info(f"Initialized an {self.mode} Windowing Class")
+
+    def get_input_sequences(self, window: int = 5, on_column: str = None, target: str = None) -> Tuple[np.array, np.array]:
+        if self.mode == 'Univariate':
+            return self._get_univariate_sequences(on_column=on_column, window=window)
+        elif self.mode == 'Multivariate':
+            return self._get_multivariate_sequences(window=window, target=target)
+
+    def _get_univariate_sequences(self, on_column: str, window: int = 5) -> Tuple[np.array, np.array]:
         assert isinstance(window, int), f" 'Window' is expected to be an integer, but got {type(window)}."
         assert isinstance(on_column, str), f" 'On_column' is expected to be a string, but got {type(on_column)}."
         assert on_column in self.df.columns, f" {on_column} is not a column in the dataframe."
@@ -52,11 +72,34 @@ class Windowing:
         X = []
         y = []
 
-        for i in range(len(df_as_np)-window):
-            X.append([[a] for a in df_as_np[i:i+window]])
-            y.append(df_as_np[i+window])
+        for increment in range(len(df_as_np)-window):
+            X.append([[a] for a in df_as_np[increment:increment+window]])
+            y.append(df_as_np[increment+window])
 
         return np.array(X), np.array(y)
+
+    def _get_multivariate_sequences(self, target: str, window: int = 5) -> Tuple[np.array, np.array]:
+        assert isinstance(window, int), f" 'Window' is expected to be an integer, but got {type(window)}."
+        assert isinstance(target, str), f" 'Target' is expected to be a string, but got {type(target)}."
+        assert target in self.df.columns, f" {target} is not a column in the dataframe."
+
+        # Transform the dataframe to a pd.Series and keep a dictionary with column names and indexes
+        df_copy = self.df.copy()
+        df_copy = df_copy.loc[:, df_copy.columns != 'date']
+
+        column_dict = {k: v for v, k in enumerate(df_copy.columns)}
+        df_as_np = df_copy.to_numpy()
+
+        X = []
+        y = []
+
+        target_index = column_dict[target]
+
+        for increment in range(len(df_as_np)-window):
+            X.append([[[[df_as_np[i][j]] for i in range(increment, increment+window)] for j in range(df_as_np.shape[1])]])
+            y.append(df_as_np[increment+window][target_index])
+
+        return X, y
 
 
 def preprocess_co2_emissions(df: pd.DataFrame) -> pd.DataFrame:
