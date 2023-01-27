@@ -20,6 +20,26 @@ def check_correct_structures(processed_data_dict: Dict) -> Dict:
     return processed_data_dict
 
 
+def check_correct_dates(processed_data_dict: Dict) -> Dict:
+    """
+    Parameters:
+        processed_data_dict: Dictionary of previously preprocessed time series data
+    Returns:
+        Same dictionary after checking correct structures (Only two columns per dataframe, where one of them is 'date')
+    """
+
+    data_dict_relevant_years = check_correct_structures(processed_data_dict=processed_data_dict)
+
+    for df_name, df in data_dict_relevant_years.items():
+        assert len(df.columns) == 2, f"The {df_name} dataframe has more than two columns." \
+                                   f"Only two columns are allowed: 'date' and value of the predictor."
+        assert 'date' in df.columns, f"One column of the dataframe {df_name} must be named 'date'."
+        assert df['date'].dtype == 'datetime64[ns]', f"Column 'date' of {df_name} should be datetime64 type."
+        assert df['date'].min() == '1965-12-31', f"The first date of {df_name} should be 1965-12-31."
+        assert df['date'].max() == '2019-12-31', f"The last date of {df_name} should be 2019-12-31."
+    return data_dict_relevant_years
+
+
 def get_eda_summary(processed_data_dict: Dict) -> pd.DataFrame:
     """
     Parameters:
