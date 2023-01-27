@@ -1,7 +1,8 @@
-import tensorflow as tf
-from typing import Dict, Tuple
-import numpy as np
 import logging
+from typing import Dict, Tuple
+
+import numpy as np
+import tensorflow as tf
 from omegaconf import DictConfig
 
 logger = logging.getLogger(__name__)
