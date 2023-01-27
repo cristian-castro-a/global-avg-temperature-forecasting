@@ -1,0 +1,19 @@
+hydra:
+  output_subdir: null
+  run:
+    dir: .
+
+order:
+  p: [0,1,2,3]
+  q: [0,1,2,3]
+  d: [0,1,2]
+
+sig_value: 0.05
+bxcx_scalar: 0.01
+
+transformers:
+  sqrt: 'Square_Root_Transformed'
+  log: 'Log_Transformed'
+  bxcx: 'Box_Cox_Transformed'
+
+lambda: [-1, -0.5, 1]

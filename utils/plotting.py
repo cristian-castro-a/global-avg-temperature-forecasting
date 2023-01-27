@@ -1,10 +1,12 @@
 import plotly.express as px
+import plotly.graph_objects as go
 import pandas as pd
+import numpy as np
 from pathlib import Path
 
 
 def plot_lines_by(data: pd.DataFrame, plot_x: str, plot_y: str, path_to_results: Path,
-                  file_name: str, plot_by: str=None) -> None:
+                  file_name: str, plot_by: str = None) -> None:
     """
     Plots lines y = f(x) from a dataframe, separating series by a column name
     :param data: dataframe with data
@@ -39,4 +41,36 @@ def plot_lines_by(data: pd.DataFrame, plot_x: str, plot_y: str, path_to_results:
         yaxis_title=plot_y
     )
 
+    fig.write_html(path_to_file)
+
+
+def create_corr_plot(corr_array: np.array, title: str, path_to_results: Path,
+                     file_name: str) -> None:
+    """
+        Plots auto or partial correlation plot of a series
+        :param corr_array: correlation array to be plotted
+        :param title: title of the plot
+        :param path_to_results: path to point where to store results in .html
+        :param file_name: name of file to be stored as html
+        :return: prints a .html plot
+        """
+    path_to_file = path_to_results.joinpath(file_name)
+
+    lower_y = corr_array[1][:, 0] - corr_array[0]
+    upper_y = corr_array[1][:, 1] - corr_array[0]
+
+    fig = go.Figure()
+    [fig.add_scatter(x=(x, x), y=(0, corr_array[0][x]), mode='lines', line_color='#3f3f3f')
+     for x in range(len(corr_array[0]))]
+    fig.add_scatter(x=np.arange(len(corr_array[0])), y=corr_array[0], mode='markers', marker_color='#1f77b4',
+                    marker_size=12)
+    fig.add_scatter(x=np.arange(len(corr_array[0])), y=upper_y, mode='lines', line_color='rgba(255,255,255,0)')
+    fig.add_scatter(x=np.arange(len(corr_array[0])), y=lower_y, mode='lines', fillcolor='rgba(32, 146, 230,0.3)',
+                    fill='tonexty', line_color='rgba(255,255,255,0)')
+    fig.update_traces(showlegend=False)
+    fig.update_xaxes(range=[-1, 42])
+    fig.update_yaxes(zerolinecolor='#000000')
+
+    title = title
+    fig.update_layout(title=title)
     fig.write_html(path_to_file)
