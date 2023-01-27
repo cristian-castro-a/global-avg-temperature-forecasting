@@ -39,3 +39,4 @@ The following datasets were used in this project:
 - world_population.csv: World population data by [macrotrends](https://www.macrotrends.net/countries/WLD/world/population)
 - Oil_consumption_per_capita.csv: Oil consumption per capita by [Our World in Data](https://ourworldindata.org/grapher/oil-consumption-per-capita)
 - Global-energy-substitution.csv: Primary energy consumption via the ‘substitution method’ by [Our World in Data](https://ourworldindata.org/energy-production-consumption)
+- world_gdp.csv: Yearly GDP data by [The World Bank](https://data.worldbank.org/indicator/NY.GDP.MKTP.CD)

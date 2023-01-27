@@ -7,6 +7,8 @@ from omegaconf import DictConfig
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import MinMaxScaler, RobustScaler
 
+from utils.sdk_config import SDKConfig
+
 logger = logging.getLogger(__name__)
 
 
@@ -69,7 +71,8 @@ def preprocess_co2_emissions(df: pd.DataFrame) -> pd.DataFrame:
     # To work with tonnes of co2 it is necessary a conversion factor of 3.664
     df['co2'] = df['co2'] / 3.664
     df.rename(columns={'date': 'date', 'co2': 'co2_emissions'}, inplace=True)
-    df.to_pickle("./co2_emission")
+    path_to_results = SDKConfig().get_output_dir("processed_dataframes_pickle_files") / "co2_emission.pkl"
+    df.to_pickle(path_to_results)
     # Filter dataset for a constant time period from 1965 onwards till 2019
     df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
@@ -81,7 +84,8 @@ def preprocess_global_temperature(df: pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year', 'month', 'day']]))
     df.drop(['Year', 'month', 'day', 'Lowess(5)'], axis=1, inplace=True)
     df.rename(columns={'date': 'date', 'No_Smoothing': 'global_temperature'}, inplace=True)
-    df.to_pickle("./global_temperature")
+    path_to_results = SDKConfig().get_output_dir("processed_dataframes_pickle_files") / "global_temperature.pkl"
+    df.to_pickle(path_to_results)
     # Filter dataset for a constant time period from 1965 onwards till 2019
     df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
@@ -94,7 +98,8 @@ def preprocess_ocean_warming(df: pd.DataFrame) -> pd.DataFrame:
     df.drop([col for col in df.columns if col not in ('date', 'NOAA')], axis=1, inplace=True)
     df.rename(columns={'index': 'date', 'NOAA': 'ocean_warming'}, inplace=True)
     df['date'] = pd.to_datetime(df['date'])
-    df.to_pickle("./ocean_warming")
+    path_to_results = SDKConfig().get_output_dir("processed_dataframes_pickle_files") / "ocean_warming.pkl"
+    df.to_pickle(path_to_results)
     # Filter dataset for a constant time period from 1965 onwards till 2019
     df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
@@ -107,7 +112,8 @@ def preprocess_world_employment(df:pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=2, column='day', value=31)
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['year','month','day']]))
     df.drop(['year','month','day'], axis=1, inplace=True)
-    df.to_pickle("./world_employment")
+    path_to_results = SDKConfig().get_output_dir("processed_dataframes_pickle_files") / "world_employment.pkl"
+    df.to_pickle(path_to_results)
     # Filter dataset for a constant time period from 1965 onwards till 2019
     df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
@@ -120,7 +126,8 @@ def preprocess_energy_substitution(df:pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=2, column='day', value=31)
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year','month','day']]))
     df.drop(['Year','month','day'], axis=1, inplace=True)
-    df.to_pickle("./energy_substitution")
+    path_to_results = SDKConfig().get_output_dir("processed_dataframes_pickle_files") / "energy_substitution.pkl"
+    df.to_pickle(path_to_results)
     # Filter dataset for a constant time period from 1965 onwards till 2019
     df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
@@ -131,7 +138,8 @@ def preprocess_world_population(df:pd.DataFrame) -> pd.DataFrame:
     df.rename(columns={' Population':'world_population'}, inplace=True)
     df.date = pd.to_datetime(df['date'])
     df = df[['date','world_population']]
-    df.to_pickle("./world_population")
+    path_to_results = SDKConfig().get_output_dir("processed_dataframes_pickle_files") / "world_population.pkl"
+    df.to_pickle(path_to_results)
     # Filter dataset for a constant time period from 1965 onwards till 2019
     df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
@@ -147,7 +155,8 @@ def preprocess_renewable_energy_share(df: pd.DataFrame) -> pd.DataFrame:
     df.drop(['Year', 'month', 'day'], axis=1, inplace=True)
     df.rename(columns={'date': 'date', 'Renewables (% equivalent primary energy)': 'renewable_energy_share'},
               inplace=True)
-    df.to_pickle("./renewable_energy_share")
+    path_to_results = SDKConfig().get_output_dir("processed_dataframes_pickle_files") / "renewable_energy_share.pkl"
+    df.to_pickle(path_to_results)
     # Filter dataset for a constant time period from 1965 onwards till 2019
     df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
@@ -162,7 +171,8 @@ def preprocess_oil_consumption(df: pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year', 'month', 'day']]))
     df.drop(['Year', 'month', 'day'], axis=1, inplace=True)
     df.rename(columns={'date': 'date', 'Oil per capita (kWh)': 'oil_consumption_per_capita'}, inplace=True)
-    df.to_pickle("./oil_consumption")
+    path_to_results = SDKConfig().get_output_dir("processed_dataframes_pickle_files") / "oil_consumption.pkl"
+    df.to_pickle(path_to_results)
     # Filter dataset for a constant time period from 1965 onwards till 2019
     df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
@@ -174,7 +184,8 @@ def preprocess_world_gdp(df: pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['year', 'month', 'day']]))
     df.drop(['year', 'month', 'day'], axis=1, inplace=True)
     df.rename(columns={'date': 'date', 'mean_gdp': 'world_gdp'}, inplace=True)
-    df.to_pickle("./world_gdp")
+    path_to_results = SDKConfig().get_output_dir("processed_dataframes_pickle_files") / "world_gdp.pkl"
+    df.to_pickle(path_to_results)
     # Filter dataset for a constant time period from 1965 onwards till 2019
     df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
@@ -226,5 +237,4 @@ def preprocess_data(data_dict: Dict, config: DictConfig) -> Dict:
     for df_name, df in data_dict.items():
         logger.info(f'Preprocessing dataframe: {df_name}')
         processed_data_dict[df_name] = preprocess_dataframe(df_name=df_name, df=df)
-
     return processed_data_dict
