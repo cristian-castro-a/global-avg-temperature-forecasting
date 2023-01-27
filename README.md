@@ -24,10 +24,7 @@ conda create --name <env> --file requirements_windows.txt
 ```
 
 ### MacOS
-If you are on a MacOS computer with M1 chip, please use the `requirements_m1_macos.txt` file to install all dependencies necessary for this project in a Conda environment, by running the following command on your terminal:
-```bash
-conda create --name py39 --file requirements_m1_macos.txt
-```
+If you are on a MacOS computer with M1 chip, please use the `build_macos.sh` bash file to install all dependencies necessary for this project in a Conda environment.
 
 ## Data
 The following datasets were used in this project:
@@ -37,5 +34,5 @@ The following datasets were used in this project:
 - renewable_share_energy.csv: Renewable Energy Production of countries by [Our World in Data](https://ourworldindata.org/renewable-energy)
 - World_Employment_Rate.csv: World Employment Rate(in percent of working population) by [OECD Data](https://data.oecd.org/emp/employment-rate.htm)
 - world_population.csv: World population data by [macrotrends](https://www.macrotrends.net/countries/WLD/world/population)
-- Oil_consumption_per_capita.csv: Oil consumption per capita by [Our World in Data](https://ourworldindata.org/grapher/oil-consumption-per-capita)
-- Global-energy-substitution.csv: Primary energy consumption via the ‘substitution method’ by [Our World in Data](https://ourworldindata.org/energy-production-consumption)
+- oil_consumption_per_capita.csv: Oil consumption per capita by [Our World in Data](https://ourworldindata.org/grapher/oil-consumption-per-capita)
+- global-energy-substitution.csv: Primary energy consumption via the ‘substitution method’ by [Our World in Data](https://ourworldindata.org/energy-production-consumption)
