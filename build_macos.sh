@@ -18,3 +18,7 @@ pip install numpy --upgrade
 conda install -c conda-forge matplotlib
 pip install numpy==1.23.5
 conda install -c anaconda scikit-learn
+
+# Downgrade due to problems with latest version and MacOs M1
+python -m pip install tensorflow-macos==2.9
+python -m pip install tensorflow-metal==0.5.0

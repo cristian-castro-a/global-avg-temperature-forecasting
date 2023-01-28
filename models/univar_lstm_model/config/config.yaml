@@ -17,10 +17,14 @@ datafiles:
 univariate_lstm_model:
   scaler: 'MinMaxScaler'
   test_size_split: 0.1
-  nr_lstm_layers: 2
+  nr_lstm_layers: 1
   nr_dense_layers: 1
   units_per_layer:
     LSTM_1: 100
-    LSTM_2: 20
     DENSE_1: 10
   dense_layer_activation: 'relu'
+  loss: 'mean_squared_error'
+  optimizer: 'Adam'
+  metrics:
+    - 'MeanSquaredError'
+    - 'MeanAbsoluteError'
