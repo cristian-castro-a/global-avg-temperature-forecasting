@@ -1,5 +1,4 @@
 import logging
-from typing import Dict, Tuple
 
 import numpy as np
 import pandas as pd
@@ -7,6 +6,8 @@ from statsmodels.tsa.stattools import acf, pacf
 from statsmodels.tsa.stattools import adfuller
 from scipy.stats import boxcox
 from typing import Dict, Tuple
+from statsmodels.tsa.arima_model import ARIMA, ARIMAResultsWrapper
+from utils.sdk_config import SDKConfig
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +31,20 @@ def adf_test(data: pd.DataFrame, col_name: str, sig_value: float) -> float:
     else:
         print(f" {col_name}e : P-Value = {p_value} => Non-stationary.")
     return p_value
+
+
+def arima_model(data: pd.DataFrame, col_name: str, p: int, d: int, q: int) -> ARIMAResultsWrapper:
+    """Creates ARIMA model saves summary to text file"""
+    model = ARIMA(data[col_name], order=(p, d, q))
+    model_fit = model.fit(disp=0)
+
+    # Save summary to text file
+    file_name = 'arima_summary_'+str(p)+str(d)+str(q)+'.txt'
+    path_to_results = SDKConfig().get_output_dir("ARIMA_summary") / file_name
+    with open(path_to_results, 'w') as f:
+        print(model_fit.summary(), file=f)
+
+    return model_fit
 
 
 class DataTransformers:
