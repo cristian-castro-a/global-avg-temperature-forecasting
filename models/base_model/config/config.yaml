@@ -3,6 +3,17 @@ hydra:
   run:
     dir: .
 
+datafiles:
+  global_temperature: 'global_temperature.txt'
+  ocean_warming: 'ocean_heat.csv'
+  co2_emissions: 'owid-co2-data.csv'
+  renewable_energy_share: 'renewable_share_energy.csv'
+  world_employment_rate: 'World_Employment_Rate.csv'
+  world_population: 'world_population.csv'
+  oil_consumption_per_capita: 'oil_consumption_per_capita.csv'
+  global_energy_substitution: 'global_energy_substitution.csv'
+  world_gdp: 'world_gdp.csv'
+
 order:
   p: [0,1,2,3]
   q: [0,1,2,3]
@@ -11,9 +22,15 @@ order:
 sig_value: 0.05
 bxcx_scalar: 0.01
 
+timeframes:
+  year_initial : 1965
+  year_end : 2019
+
 transformers:
+  nil: 'Not_transformed'
   sqrt: 'Square_Root_Transformed'
   log: 'Log_Transformed'
   bxcx: 'Box_Cox_Transformed'
+  cbrt: 'Cube_Root_Transformed'
 
 lambda: [-1, -0.5, 1]

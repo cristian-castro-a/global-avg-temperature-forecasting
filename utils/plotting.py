@@ -3,9 +3,10 @@ import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 from pathlib import Path
+from typing import Union
 
 
-def plot_lines_by(data: pd.DataFrame, plot_x: str, plot_y: str, path_to_results: Path,
+def plot_lines_by(data: pd.DataFrame, plot_x: str, plot_y: Union[str, list], x_title: str, y_title: str, path_to_results: Path,
                   file_name: str, plot_by: str = None) -> None:
     """
     Plots lines y = f(x) from a dataframe, separating series by a column name
@@ -17,6 +18,8 @@ def plot_lines_by(data: pd.DataFrame, plot_x: str, plot_y: str, path_to_results:
     path_to_file = path_to_results.joinpath(file_name)
 
     if plot_by is not None:
+        if type(plot_y) != str:
+            raise TypeError(f"Argument plot_y is expected to be string received {plot_y}")
         if not plot_by in data.columns:
             raise KeyError(f"There is no column named '{plot_by}' in dataframe")
 
@@ -27,6 +30,7 @@ def plot_lines_by(data: pd.DataFrame, plot_x: str, plot_y: str, path_to_results:
             color=plot_by,
             markers=True
         )
+        title = f"{plot_y} vs. {plot_x} by {plot_by}"
     else:
         fig = px.line(
             data_frame=data,
@@ -34,11 +38,12 @@ def plot_lines_by(data: pd.DataFrame, plot_x: str, plot_y: str, path_to_results:
             y=plot_y,
             markers=True
         )
+        title = f"{plot_y} vs. {plot_x}"
 
     fig.update_layout(
-        title=f"{plot_y} vs. {plot_x} by {plot_by}",
-        xaxis_title=plot_x,
-        yaxis_title=plot_y
+        title=title,
+        xaxis_title=x_title,
+        yaxis_title=y_title
     )
 
     fig.write_html(path_to_file)

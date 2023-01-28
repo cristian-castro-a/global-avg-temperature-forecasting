@@ -82,4 +82,4 @@ def plot_time_series(processed_data_dict: Dict, path_to_results: Path):
     for df_name, df in checked_data_dict.items():
         file_name = df_name + ".html"
         plot_lines_by(data=df, plot_x='date', plot_y=df_name, path_to_results=path_to_results,
-                      file_name=file_name)
+                      file_name=file_name, x_title='date', y_title=df_name)

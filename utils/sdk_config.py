@@ -5,12 +5,14 @@ class SDKConfig:
     """
     SDK for this project
     """
+
     def __init__(self):
         self.root_dir = Path(__file__).resolve().parents[1]
         self.data_dir = self.root_dir / 'data'
         self.eda_dir = self.root_dir / 'exploratory_data_analysis'
         self.models_dir = self.root_dir / 'models'
         self.base_model_dir = self.models_dir / 'base_model'
+        self.best_model_dir = self.base_model_dir / 'best_arima_model'
         self.univar_lstm_dir = self.models_dir / 'univar_lstm_model'
         self.multivar_lstm_dir = self.models_dir / 'multivar_lstm_model'
         self.forecasting_dir = self.root_dir / 'forecasting'
@@ -25,3 +27,7 @@ class SDKConfig:
         for key, value in self.__dict__.items():
             if key is not 'root_dir':
                 value.mkdir(parents=True, exist_ok=True)
+
+    def get_best_arima_dir(self) -> Path:
+        best_model_dir = self.best_model_dir
+        return best_model_dir
