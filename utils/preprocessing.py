@@ -3,8 +3,11 @@ from typing import Dict, Tuple
 
 import numpy as np
 import pandas as pd
+from omegaconf import DictConfig
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.preprocessing import MinMaxScaler, RobustScaler
+from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
+
+from utils.sdk_config import SDKConfig
 
 logger = logging.getLogger(__name__)
 
@@ -13,15 +16,20 @@ class PredictorScaler(BaseEstimator, TransformerMixin):
     """
     Class that stores values of a given predictor and its scaler (MinMaxScaler or RobustScaler)
     """
-    def __init__(self, scaler: str, feature_range: Tuple[int,int], variable_values: pd.DataFrame):
-        if scaler == 'MinMaxScaler':
+    def __init__(self, scaler: str, variable_values: pd.Series, feature_range: Tuple[int,int] = None):
+        self.name_scaler = scaler
+        self.variable_values = variable_values.values.reshape(-1, 1)
+
+        if self.name_scaler == 'MinMaxScaler':
             self.scaler = MinMaxScaler(feature_range=feature_range)
-        elif scaler == 'RobustScaler':
+        elif self.name_scaler == 'StandardScaler':
+            self.scaler = StandardScaler()
+        elif self.name_scaler == 'RobustScaler':
             self.scaler = RobustScaler()
         else:
-            raise NameError("You can only choose between 'MinMaxScaler' and 'RobustScaler'")
+            raise NameError("You can only choose between 'MinMaxScaler', 'RobustScaler' and 'StandardScaler'")
 
-        self.variable_values = variable_values.values.reshape(-1, 1)
+        logger.info(f"Initialized {self.name_scaler}")
 
     def fit(self):
         self.scaler.fit(self.variable_values)
@@ -37,12 +45,27 @@ class PredictorScaler(BaseEstimator, TransformerMixin):
 
 class Windowing:
     """
-    Class to create fixed length sequences to train a LSTM Model
+    Class to create fixed length sequences to train LSTM Models (Univariate or Multivariate)
     """
-    def __init__(self, df: pd.DataFrame):
+    def __init__(self, df: pd.DataFrame, mode: str):
         self.df = df
 
-    def get_input_sequences(self, on_column: str, window: int = 5) -> Tuple[np.array, np.array]:
+        if mode == 'Univariate':
+            self.mode = 'Univariate'
+        elif mode == 'Multivariate':
+            self.mode = 'Multivariate'
+        else:
+            raise NameError("Mode can be 'Univariate' or 'Multivariate'")
+
+        logger.info(f"Initialized an {self.mode} Windowing Class")
+
+    def get_input_sequences(self, window: int = 5, on_column: str = None, target: str = None) -> Tuple[np.array, np.array]:
+        if self.mode == 'Univariate':
+            return self._get_univariate_sequences(on_column=on_column, window=window)
+        elif self.mode == 'Multivariate':
+            return self._get_multivariate_sequences(window=window, target=target)
+
+    def _get_univariate_sequences(self, on_column: str, window: int = 5) -> Tuple[np.array, np.array]:
         assert isinstance(window, int), f" 'Window' is expected to be an integer, but got {type(window)}."
         assert isinstance(on_column, str), f" 'On_column' is expected to be a string, but got {type(on_column)}."
         assert on_column in self.df.columns, f" {on_column} is not a column in the dataframe."
@@ -52,11 +75,34 @@ class Windowing:
         X = []
         y = []
 
-        for i in range(len(df_as_np)-window):
-            X.append([[a] for a in df_as_np[i:i+window]])
-            y.append(df_as_np[i+window])
+        for increment in range(len(df_as_np)-window):
+            X.append([[a] for a in df_as_np[increment:increment+window]])
+            y.append(df_as_np[increment+window])
 
         return np.array(X), np.array(y)
+
+    def _get_multivariate_sequences(self, target: str, window: int = 5) -> Tuple[np.array, np.array]:
+        assert isinstance(window, int), f" 'Window' is expected to be an integer, but got {type(window)}."
+        assert isinstance(target, str), f" 'Target' is expected to be a string, but got {type(target)}."
+        assert target in self.df.columns, f" {target} is not a column in the dataframe."
+
+        # Transform the dataframe to a pd.Series and keep a dictionary with column names and indexes
+        df_copy = self.df.copy()
+        df_copy = df_copy.loc[:, df_copy.columns != 'date']
+
+        column_dict = {k: v for v, k in enumerate(df_copy.columns)}
+        df_as_np = df_copy.to_numpy()
+
+        X = []
+        y = []
+
+        target_index = column_dict[target]
+
+        for increment in range(len(df_as_np)-window):
+            X.append([[[[df_as_np[i][j]] for i in range(increment, increment+window)] for j in range(df_as_np.shape[1])]])
+            y.append(df_as_np[increment+window][target_index])
+
+        return X, y
 
 
 def preprocess_co2_emissions(df: pd.DataFrame) -> pd.DataFrame:
@@ -68,6 +114,10 @@ def preprocess_co2_emissions(df: pd.DataFrame) -> pd.DataFrame:
     # To work with tonnes of co2 it is necessary a conversion factor of 3.664
     df['co2'] = df['co2'] / 3.664
     df.rename(columns={'date': 'date', 'co2': 'co2_emissions'}, inplace=True)
+    path_to_results = SDKConfig().get_output_dir("processed_dataframes_pickle_files") / "co2_emission.pkl"
+    df.to_pickle(path_to_results)
+    # Filter dataset for a constant time period from 1965 onwards till 2019
+    df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
 
 
@@ -77,6 +127,10 @@ def preprocess_global_temperature(df: pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year', 'month', 'day']]))
     df.drop(['Year', 'month', 'day', 'Lowess(5)'], axis=1, inplace=True)
     df.rename(columns={'date': 'date', 'No_Smoothing': 'global_temperature'}, inplace=True)
+    path_to_results = SDKConfig().get_output_dir("processed_dataframes_pickle_files") / "global_temperature.pkl"
+    df.to_pickle(path_to_results)
+    # Filter dataset for a constant time period from 1965 onwards till 2019
+    df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
 
 
@@ -87,31 +141,38 @@ def preprocess_ocean_warming(df: pd.DataFrame) -> pd.DataFrame:
     df.drop([col for col in df.columns if col not in ('date', 'NOAA')], axis=1, inplace=True)
     df.rename(columns={'index': 'date', 'NOAA': 'ocean_warming'}, inplace=True)
     df['date'] = pd.to_datetime(df['date'])
+    path_to_results = SDKConfig().get_output_dir("processed_dataframes_pickle_files") / "ocean_warming.pkl"
+    df.to_pickle(path_to_results)
+    # Filter dataset for a constant time period from 1965 onwards till 2019
+    df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
 
 
 def preprocess_world_employment(df:pd.DataFrame) -> pd.DataFrame:
     df = df.groupby(by=['TIME']).mean().reset_index()
-    # Filter dataset for a constant time period from 1965 onwards
-    df = df[df['TIME'] > 1964]
-    df = df.rename(columns = {'TIME':'year'})
+    df.rename(columns={'TIME':'year' , 'Value': 'world_employment_rate'}, inplace=True)
     df.insert(loc=1, column='month', value=12)
     df.insert(loc=2, column='day', value=31)
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['year','month','day']]))
     df.drop(['year','month','day'], axis=1, inplace=True)
-    df.rename(columns= {'Value':'world_employment_rate'}, inplace=True)
+    path_to_results = SDKConfig().get_output_dir("processed_dataframes_pickle_files") / "world_employment.pkl"
+    df.to_pickle(path_to_results)
+    # Filter dataset for a constant time period from 1965 onwards till 2019
+    df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
 
 
 def preprocess_energy_substitution(df:pd.DataFrame) -> pd.DataFrame:
     df['global_energy_substitution'] = df.filter(like='substituted energy', axis=1).sum(axis=1)
     df = df[['Year', 'global_energy_substitution']]
-    # Filter dataset for a constant time period from 1965 onwards
-    df = df[df['Year'] > 1964]
     df.insert(loc=1, column='month', value=12)
     df.insert(loc=2, column='day', value=31)
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year','month','day']]))
     df.drop(['Year','month','day'], axis=1, inplace=True)
+    path_to_results = SDKConfig().get_output_dir("processed_dataframes_pickle_files") / "energy_substitution.pkl"
+    df.to_pickle(path_to_results)
+    # Filter dataset for a constant time period from 1965 onwards till 2019
+    df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
 
 
@@ -119,9 +180,11 @@ def preprocess_world_population(df:pd.DataFrame) -> pd.DataFrame:
     df.reset_index(inplace= True)
     df.rename(columns={' Population':'world_population'}, inplace=True)
     df.date = pd.to_datetime(df['date'])
-    # Filter dataset for a constant time period from 1965 onwards
-    df = df[df['date'].dt.year > 1964]
     df = df[['date','world_population']]
+    path_to_results = SDKConfig().get_output_dir("processed_dataframes_pickle_files") / "world_population.pkl"
+    df.to_pickle(path_to_results)
+    # Filter dataset for a constant time period from 1965 onwards till 2019
+    df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
 
 
@@ -135,6 +198,10 @@ def preprocess_renewable_energy_share(df: pd.DataFrame) -> pd.DataFrame:
     df.drop(['Year', 'month', 'day'], axis=1, inplace=True)
     df.rename(columns={'date': 'date', 'Renewables (% equivalent primary energy)': 'renewable_energy_share'},
               inplace=True)
+    path_to_results = SDKConfig().get_output_dir("processed_dataframes_pickle_files") / "renewable_energy_share.pkl"
+    df.to_pickle(path_to_results)
+    # Filter dataset for a constant time period from 1965 onwards till 2019
+    df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
 
 
@@ -147,6 +214,10 @@ def preprocess_oil_consumption(df: pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['Year', 'month', 'day']]))
     df.drop(['Year', 'month', 'day'], axis=1, inplace=True)
     df.rename(columns={'date': 'date', 'Oil per capita (kWh)': 'oil_consumption_per_capita'}, inplace=True)
+    path_to_results = SDKConfig().get_output_dir("processed_dataframes_pickle_files") / "oil_consumption.pkl"
+    df.to_pickle(path_to_results)
+    # Filter dataset for a constant time period from 1965 onwards till 2019
+    df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
 
 
@@ -156,6 +227,10 @@ def preprocess_world_gdp(df: pd.DataFrame) -> pd.DataFrame:
     df.insert(loc=0, column='date', value=pd.to_datetime(df[['year', 'month', 'day']]))
     df.drop(['year', 'month', 'day'], axis=1, inplace=True)
     df.rename(columns={'date': 'date', 'mean_gdp': 'world_gdp'}, inplace=True)
+    path_to_results = SDKConfig().get_output_dir("processed_dataframes_pickle_files") / "world_gdp.pkl"
+    df.to_pickle(path_to_results)
+    # Filter dataset for a constant time period from 1965 onwards till 2019
+    df = df[(df['date'].dt.year >= year_initial) & (df['date'].dt.year <= year_end)]
     return df
 
 
@@ -189,15 +264,19 @@ def preprocess_dataframe(df_name: str, df: pd.DataFrame) -> pd.DataFrame:
     return preprocessed_df
 
 
-def preprocess_data(data_dict: Dict) -> Dict:
+def preprocess_data(data_dict: Dict, config: DictConfig) -> Dict:
     """
     Parameters:
         data_dict: Dictionary with dataframes (each of which to be preprocessed differently)
+        config : Config file for variables
     Returns:
         Dictionary of preprocessed dataframes
     """
     processed_data_dict = {}
     logger.info('Preprocessing dataframes')
+    global year_initial, year_end
+    year_initial = config['timeframes'].get('year_initial')
+    year_end = config['timeframes'].get('year_end')
     for df_name, df in data_dict.items():
         logger.info(f'Preprocessing dataframe: {df_name}')
         processed_data_dict[df_name] = preprocess_dataframe(df_name=df_name, df=df)

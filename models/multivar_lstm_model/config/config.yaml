@@ -13,7 +13,3 @@ datafiles:
   oil_consumption_per_capita: 'oil_consumption_per_capita.csv'
   global_energy_substitution: 'global_energy_substitution.csv'
   world_gdp: 'world_gdp.csv'
-
-timeframes:
-  year_initial : 1965
-  year_end : 2019
