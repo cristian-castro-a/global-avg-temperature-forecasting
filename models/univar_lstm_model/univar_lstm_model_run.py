@@ -3,11 +3,13 @@ import logging
 import hydra
 import pandas as pd
 from omegaconf import DictConfig
+from pathlib import Path
 
 from build_uni_lstm import univariate_lstm
 from utils.parsers import read_data
 from utils.preprocessing import preprocess_data, Windowing, PredictorScaler
 from utils.sdk_config import SDKConfig
+from utils.plotting import plot_lstm_results
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +23,7 @@ def main(config: DictConfig) -> None:
     SDKConfig().set_working_dirs()
 
     data_dict = read_data(data_dir=SDKConfig().data_dir, config=config)
-    processed_data_dict = preprocess_data(data_dict=data_dict)
+    processed_data_dict = preprocess_data(data_dict=data_dict, config=config)
 
     # Get Scaled Data
     scaler = PredictorScaler(scaler=config.univariate_lstm_model.scaler,
@@ -50,6 +52,13 @@ def main(config: DictConfig) -> None:
         epochs=5,
         batch_size=1
     )
+
+    # Get predictions
+    path_to_results = SDKConfig().get_output_dir("plots_model_results")
+    predictions = model.predict(X)
+    predictions = scaler.inverse_transform(predictions)
+    plot_lstm_results(history, processed_data_dict['global_temperature']['global_temperature'][-len(predictions):],
+                      predictions.flatten(), path_to_results, 'lstm_results.html')
 
 
 if __name__ == '__main__':
