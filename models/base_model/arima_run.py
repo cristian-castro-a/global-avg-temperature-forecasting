@@ -4,7 +4,7 @@ import hydra
 import pandas as pd
 from omegaconf import DictConfig
 import math
-from models.base_model.base_model_helper import get_correlation_array, adf_test, arima_model, DataTransformers, \
+from models.base_model.utils import get_correlation_array, adf_test, arima_model, DataTransformers, \
     plot_auto_correlation
 from utils.exploratory_data_analysis import get_eda_summary, plot_time_series
 from utils.parsers import read_data
