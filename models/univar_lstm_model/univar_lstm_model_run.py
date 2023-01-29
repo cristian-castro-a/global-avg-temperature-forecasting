@@ -21,7 +21,7 @@ def main(config: DictConfig) -> None:
     SDKConfig().set_working_dirs()
 
     data_dict = read_data(data_dir=SDKConfig().data_dir, config=config)
-    processed_data_dict = preprocess_data(data_dict=data_dict)
+    processed_data_dict = preprocess_data(data_dict=data_dict, config=config)
 
     # Get Scaled Data
     scaler = PredictorScaler(scaler=config.univariate_lstm_model.scaler,
