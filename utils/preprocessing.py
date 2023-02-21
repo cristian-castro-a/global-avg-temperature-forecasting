@@ -42,6 +42,11 @@ class PredictorScaler(BaseEstimator, TransformerMixin):
     def fit_transform(self, variable_values: pd.DataFrame, y=None, **fit_params):
         return self.fit().transform(variable_values.values.reshape(-1, 1))
 
+    def inverse_transform(self, variable_values):
+        if isinstance(variable_values, pd.DataFrame):
+            variable_values = variable_values.values
+        return self.scaler.inverse_transform(variable_values)
+
 
 class Windowing:
     """
