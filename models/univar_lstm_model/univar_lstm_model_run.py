@@ -70,7 +70,7 @@ def main(config: DictConfig) -> None:
                   x_title='epochs', y_title="Training Losses")
 
     # Plot Errors
-    mse = history.history['mean_square_error']
+    mse = history.history['mean_squared_error']
     mae = history.history['mean_absolute_error']
 
     error_df = pd.DataFrame(
