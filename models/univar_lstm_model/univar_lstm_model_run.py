@@ -47,10 +47,40 @@ def main(config: DictConfig) -> None:
     history = model.fit(
         X,
         y,
-        validation_split=0.1,
-        epochs=5,
+        validation_split=config.univariate_lstm_model.test_size_split,
+        epochs=config.univariate_lstm_model.epochs,
         batch_size=1
     )
+
+    # Save Model
+    path_to_model = SDKConfig().get_output_dir('univar_lstm_model') / 'model_1'
+    model.save(path_to_model)
+
+    # Plot Training and Validation Losses
+    loss = history.history['loss']
+    val_loss = history.history['val_loss']
+
+    loss_df = pd.DataFrame(
+        {'epochs': [idx for idx in range(config.univariate_lstm_model.epochs)], 'loss': loss, 'val_loss': val_loss}
+    )
+
+    path_to_results = SDKConfig().get_output_dir("plots_univar_lstm_model_results")
+    plot_lines_by(data=loss_df, plot_x='epochs', plot_y=['loss', 'val_loss'],
+                  path_to_results=path_to_results, file_name="loss_plots.html",
+                  x_title='epochs', y_title="Training Losses")
+
+    # Plot Errors
+    mse = history.history['mean_squared_error']
+    mae = history.history['mean_absolute_error']
+
+    error_df = pd.DataFrame(
+        {'epochs': [idx for idx in range(config.univariate_lstm_model.epochs)], 'mse': mse, 'mae': mae}
+    )
+
+    path_to_results = SDKConfig().get_output_dir("plots_univar_lstm_model_results")
+    plot_lines_by(data=error_df, plot_x='epochs', plot_y=['mse', 'mae'],
+                  path_to_results=path_to_results, file_name="error_plots.html",
+                  x_title='epochs', y_title="Training Errors")
 
     # Make predictions
     predictions = model.predict(X)
