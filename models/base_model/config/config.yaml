@@ -27,10 +27,14 @@ timeframes:
   year_end : 2019
 
 transformers:
-  nil: 'Not_transformed'
+  nil: 'Not_Transformed'
   sqrt: 'Square_Root_Transformed'
   log: 'Log_Transformed'
   bxcx: 'Box_Cox_Transformed'
   cbrt: 'Cube_Root_Transformed'
+  mavg_1: 'Moving_Average_Window_1'
+  mavg_2: 'Moving_Average_Window_2'
+  mavg_3: 'Moving_Average_Window_3'
+
 
 lambda: [-1, -0.5, 1]

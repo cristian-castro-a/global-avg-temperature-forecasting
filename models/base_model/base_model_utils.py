@@ -53,6 +53,23 @@ def arima_model(data: pd.DataFrame, col_name: str, p: int, d: int, q: int, trans
     return model_fit
 
 
+def diff_inv(series_diff:pd.Series, first_value:float) -> pd.Series:
+    """Inverts the first order differenced series"""
+    series_inverted = np.r_[first_value, series_diff].cumsum().astype('float64')
+    return series_inverted
+
+
+def mavg_inv(s:pd.Series, shift:int, df:pd.DataFrame, col:str) -> pd.Series:
+    """Inverts moving avergae tranformation"""
+    init_values = df[col].values[:shift]
+    s_cumsum = pd.Series(np.zeros(len(s)))
+    for i in range(shift):
+        s_cumsum.iloc[i] = init_values[i]
+    for i in range(shift,len(s)):
+        s_cumsum.iloc[i] = s_cumsum.iloc[i-shift] + s.iloc[i]
+    return s_cumsum
+
+
 def plot_auto_correlation(df: pd.DataFrame, col_name: str, nlags: int, transformer_name: str) -> None:
     # get auto-correlation arrays
     acf_array = get_correlation_array(df[col_name], nlags=nlags, plot_type='acf')
@@ -112,4 +129,10 @@ class DataTransformers:
         """Does cube root transformation"""
         logger.info('Performing cube root transformation')
         self.data['transformed_gat'] = np.cbrt(self.data[self.transform_column])
+        return self.data
+    
+    def moving_average_transform(self, window_size: int) -> pd.DataFrame:
+        """Does moving average transformation"""
+        logger.info('Performing moving average transformation')
+        self.data['transformed_gat'] = self.data[self.transform_column].rolling(window=window_size).mean().dropna()
         return self.data

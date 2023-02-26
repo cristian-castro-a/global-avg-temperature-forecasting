@@ -1,14 +1,15 @@
 import logging
 
 import hydra
+import numpy as np
 import pandas as pd
 from omegaconf import DictConfig
 import math
-from models.base_model.utils import get_correlation_array, adf_test, arima_model, DataTransformers, \
-    plot_auto_correlation
+from models.base_model.base_model_utils import get_correlation_array, adf_test, arima_model, DataTransformers, \
+    plot_auto_correlation, diff_inv, mavg_inv
 from utils.exploratory_data_analysis import get_eda_summary, plot_time_series
 from utils.parsers import read_data
-from utils.plotting import create_corr_plot, plot_lines_by
+from utils.plotting import plot_lines_by
 from utils.preprocessing import preprocess_data
 from utils.sdk_config import SDKConfig
 
@@ -48,6 +49,11 @@ def main(config: DictConfig) -> None:
                 scalar=config['bxcx_scalar'])
         elif transformer == 'cbrt':
             df_transformed = DataTransformers(df_transformed, 'global_temperature').cube_root_transform()
+        elif transformer in ['mavg_1', 'mavg_2', 'mavg_3']:
+            size = int(transformer[-1:])  # extract window size
+            df_transformed = DataTransformers(df_transformed, 'global_temperature').moving_average_transform(
+                window_size=size)
+            df_transformed.dropna(inplace=True)
         else:
             df_transformed.rename(columns={'global_temperature': 'transformed_gat'}, inplace=True)
 
@@ -86,15 +92,58 @@ def main(config: DictConfig) -> None:
         del df_transformed
 
     # Create line plot visualisation for the actual and predicted values
-    logger.info(f'Best model found! Plotting predictions for {best_model_name}')
-    diff_value = int(best_model_name[-6:-5])
+    logger.info(f'Best model found!: {best_model_name}')
     df_gat_pred = df_gat.copy()
-    df_gat_pred['diff_gat'] = df_gat_pred["global_temperature"].diff(periods=diff_value)
-    df_gat_pred.insert(diff_value, 'pred_gat', lowest_model_fit.predict(dynamic=False))
+    diff_value = int(best_model_name[-6:-5])  # extract difference values
+
+    # Convert moving averaged data to original scale
+    if "Moving_Average" in best_model_name:
+        # pre-processing
+        logger.info(f'Converting Moving averaged data back to original scale')
+        size = int(best_model_name[-9:-8])  # extract window size
+        df_gat_pred.insert(1, 'pred_gat', lowest_model_fit.predict(dynamic=False))
+        df_temp = df_gat_pred.copy()
+        df_temp.drop(columns=['date', 'global_temperature'], inplace=True)
+        df_temp.dropna(inplace=True)
+        df_transformed = DataTransformers(df_gat_pred, 'global_temperature').moving_average_transform(
+            window_size=size)
+
+        # invert differencing data to original scale
+        logger.info(f'Inverting differenced values for moving averaged data')
+        if diff_value != 0:
+            for i in range(diff_value + 1):
+                temp_series = diff_inv(df_temp['pred_gat'].dropna(),
+                                       df_transformed["transformed_gat"].iloc[size - 1])
+        else:
+            temp_series = df_temp['pred_gat'].dropna()
+        df_gat_pred['temp_series'] = np.nan
+        df_gat_pred['temp_series'][size - 1:] = temp_series
+
+        # invert moving averaged data back to original scale
+        s_diffed = size * df_gat_pred['temp_series'].diff()
+        df_gat_pred = df_gat_pred.reset_index(drop=True)
+        df_gat_pred['final_pred'] = mavg_inv(s=s_diffed, shift=size, df=df_gat_pred,
+                                             col='global_temperature')
+        logger.info(f'Moving averaged data inverted')
+
+    # No transformation inversions done here since,
+    # best model is either mavg or not_transformed based on BIC
+    else:
+        logger.info(f'Inverting differenced values for the model {best_model_name}')
+        df_gat_pred.insert(diff_value, 'pred_gat', lowest_model_fit.predict(dynamic=False))
+        if diff_value != 0:
+            for i in range(diff_value + 1):
+                df_gat_pred['final_pred'] = diff_inv(df_gat_pred['pred_gat'].dropna(),
+                                                     df_gat_pred["global_temperature"].iloc[0])
+        else:
+            df_gat_pred['final_pred'] = df_gat_pred['pred_gat']
+
+    # Plot the graph comparing original and predicted
+    logger.info(f'Plotting predictions for {best_model_name}')
     path_to_results = SDKConfig().get_output_dir("model_forecasts")
-    plot_lines_by(data=df_gat_pred, plot_x='date', plot_y=['diff_gat', 'pred_gat'],
-                  path_to_results=path_to_results,file_name=f"{best_model_name}.html",
-                  x_title='date', y_title=f"Actual differenced and {best_model_name} Prediction")
+    plot_lines_by(data=df_gat_pred, plot_x='date', plot_y=['global_temperature', 'final_pred'],
+                  path_to_results=path_to_results, file_name=f"{best_model_name}.html",
+                  x_title='date', y_title=f"Actual and {best_model_name} Prediction")
 
     # Saving best ARIMA model
     path_to_best_arima = SDKConfig().get_best_arima_dir() / best_model_name
