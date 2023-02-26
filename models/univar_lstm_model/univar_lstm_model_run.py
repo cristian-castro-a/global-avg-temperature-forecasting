@@ -52,6 +52,10 @@ def main(config: DictConfig) -> None:
         batch_size=1
     )
 
+    # Save Model
+    path_to_model = SDKConfig().get_output_dir('univar_lstm_model') / 'model_1'
+    model.save(path_to_model)
+
     # Make predictions
     predictions = model.predict(X)
 
