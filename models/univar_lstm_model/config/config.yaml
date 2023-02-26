@@ -33,4 +33,4 @@ univariate_lstm_model:
   metrics:
     - 'MeanSquaredError'
     - 'MeanAbsoluteError'
-  epochs: 5
+  epochs: 50
