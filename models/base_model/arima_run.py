@@ -7,11 +7,11 @@ from omegaconf import DictConfig
 import math
 from models.base_model.base_model_utils import get_correlation_array, adf_test, arima_model, DataTransformers, \
     plot_auto_correlation, diff_inv, mavg_inv
-from utils.exploratory_data_analysis import get_eda_summary, plot_time_series
 from utils.parsers import read_data
 from utils.plotting import plot_lines_by
 from utils.preprocessing import preprocess_data
 from utils.sdk_config import SDKConfig
+from sklearn.metrics import mean_squared_error
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +28,8 @@ def main(config: DictConfig) -> None:
     processed_data_dict = preprocess_data(data_dict=data_dict, config=config)
 
     df_gat = processed_data_dict.get('global_temperature')
+    df_train = df_gat[:-6]
+    df_test = df_gat[-6:]
     lowest_aic = 10000
     lowest_model_fit = None
     best_model_name = ''
@@ -37,7 +39,7 @@ def main(config: DictConfig) -> None:
 
         # transform dataframe
         logger.info('Transforming data')
-        df_transformed = df_gat.copy()
+        df_transformed = df_train.copy()
         if transformer == 'sqrt':
             df_transformed = DataTransformers(df_transformed, 'global_temperature').square_root_transform(
                 scalar=config['bxcx_scalar'])
@@ -93,7 +95,7 @@ def main(config: DictConfig) -> None:
 
     # Create line plot visualisation for the actual and predicted values
     logger.info(f'Best model found!: {best_model_name}')
-    df_gat_pred = df_gat.copy()
+    df_gat_pred = df_train.copy()
     diff_value = int(best_model_name[-6:-5])  # extract difference values
 
     # Convert moving averaged data to original scale
@@ -102,6 +104,7 @@ def main(config: DictConfig) -> None:
         logger.info(f'Converting Moving averaged data back to original scale')
         size = int(best_model_name[-9:-8])  # extract window size
         df_gat_pred.insert(1, 'pred_gat', lowest_model_fit.predict(dynamic=False))
+        df_test.insert(1, 'final_pred', lowest_model_fit.forecast(steps=6)[0])
         df_temp = df_gat_pred.copy()
         df_temp.drop(columns=['date', 'global_temperature'], inplace=True)
         df_temp.dropna(inplace=True)
@@ -125,6 +128,8 @@ def main(config: DictConfig) -> None:
         df_gat_pred['final_pred'] = mavg_inv(s=s_diffed, shift=size, df=df_gat_pred,
                                              col='global_temperature')
         logger.info(f'Moving averaged data inverted')
+        df_gat_pred.drop(columns=['temp_series', 'pred_gat', 'transformed_gat'], inplace=True)
+        df_gat_pred = pd.concat([df_gat_pred, df_test], axis=0)
 
     # No transformation inversions done here since,
     # best model is either mavg or not_transformed based on BIC
@@ -144,6 +149,10 @@ def main(config: DictConfig) -> None:
     plot_lines_by(data=df_gat_pred, plot_x='date', plot_y=['global_temperature', 'final_pred'],
                   path_to_results=path_to_results, file_name=f"{best_model_name}.html",
                   x_title='date', y_title=f"Actual and {best_model_name} Prediction")
+
+    # Calculate MSE
+    best_model_mse = mean_squared_error(df_gat_pred['global_temperature'], df_gat_pred['final_pred'])
+    logger.info(f'Mean Squared Error Loss for best model is {best_model_mse}')
 
     # Saving best ARIMA model
     path_to_best_arima = SDKConfig().get_best_arima_dir() / best_model_name
