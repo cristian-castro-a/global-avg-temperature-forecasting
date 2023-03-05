@@ -14,25 +14,4 @@ datafiles:
   global_energy_substitution: 'global_energy_substitution.csv'
   world_gdp: 'world_gdp.csv'
 
-timeframes:
-  year_initial : 1965
-  year_end : 2019
-
-univariate_lstm_model:
-  scaler: 'MinMaxScaler'
-  test_size_split: 0.1
-  nr_lstm_layers: 2
-  nr_dense_layers: 1
-  units_per_layer:
-    LSTM_1: 200
-    LSTM_2: 100
-    DENSE_1: 80
-  dense_layer_activation: 'relu'
-  loss: 'mean_squared_error'
-  optimizer: 'Adam'
-  metrics:
-    - 'MeanSquaredError'
-    - 'MeanAbsoluteError'
-  epochs: 190
-
-best_model: 'models/univar_lstm_model/model_1'
+best_model: 'models/univar_lstm_model/model_3'

@@ -72,7 +72,7 @@ def run_forecast(config: DictConfig) -> None:
 
     total_df = pd.merge(forecast_df, real_df, how="left", on=['date'])
 
-    path_to_results = SDKConfig().get_output_dir("plots_forecasting_results")
+    path_to_results = SDKConfig().get_output_dir("plots_forecasting_results_model_3")
     plot_lines_by(data=total_df, plot_x='date', plot_y=['global_temperature', 'global_temperature_forecasted'],
                   path_to_results=path_to_results, file_name="forecast.html",
                   x_title='Date (YYYY-MM-DD)', y_title="Global Avg. Temperature (°C)")
