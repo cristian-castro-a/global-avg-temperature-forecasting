@@ -1,15 +1,16 @@
 import logging
-import hydra
-from omegaconf import DictConfig
-import tensorflow as tf
 from pathlib import Path
+
+import hydra
 import numpy as np
 import pandas as pd
+import tensorflow as tf
+from omegaconf import DictConfig
 
-from utils.preprocessing import preprocess_data, Windowing, PredictorScaler
-from utils.sdk_config import SDKConfig
 from utils.parsers import read_data
 from utils.plotting import plot_lines_by
+from utils.preprocessing import preprocess_data, Windowing, PredictorScaler
+from utils.sdk_config import SDKConfig
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +72,7 @@ def run_forecast(config: DictConfig) -> None:
 
     total_df = pd.merge(forecast_df, real_df, how="left", on=['date'])
 
-    path_to_results = SDKConfig().get_output_dir("plots_forecasting_results")
+    path_to_results = SDKConfig().get_output_dir("plots_forecasting_results_model_3")
     plot_lines_by(data=total_df, plot_x='date', plot_y=['global_temperature', 'global_temperature_forecasted'],
                   path_to_results=path_to_results, file_name="forecast.html",
                   x_title='Date (YYYY-MM-DD)', y_title="Global Avg. Temperature (°C)")
