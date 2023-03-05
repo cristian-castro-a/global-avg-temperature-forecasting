@@ -1,15 +1,16 @@
 import logging
-import hydra
-from omegaconf import DictConfig
-import tensorflow as tf
 from pathlib import Path
+
+import hydra
 import numpy as np
 import pandas as pd
+import tensorflow as tf
+from omegaconf import DictConfig
 
-from utils.preprocessing import preprocess_data, Windowing, PredictorScaler
-from utils.sdk_config import SDKConfig
 from utils.parsers import read_data
 from utils.plotting import plot_lines_by
+from utils.preprocessing import preprocess_data, Windowing, PredictorScaler
+from utils.sdk_config import SDKConfig
 
 logger = logging.getLogger(__name__)
 
