@@ -25,7 +25,7 @@ univariate_lstm_model:
   nr_dense_layers: 1
   units_per_layer:
     LSTM_1: 200
-    LSTM_2: 100
+    LSTM_2: 180
     DENSE_1: 80
   dense_layer_activation: 'relu'
   loss: 'mean_squared_error'
@@ -33,4 +33,4 @@ univariate_lstm_model:
   metrics:
     - 'MeanSquaredError'
     - 'MeanAbsoluteError'
-  epochs: 190
+  epochs: 110
