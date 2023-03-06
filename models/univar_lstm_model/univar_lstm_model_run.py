@@ -53,7 +53,7 @@ def main(config: DictConfig) -> None:
     )
 
     # Save Model
-    path_to_model = SDKConfig().get_output_dir('univar_lstm_model') / 'model_1'
+    path_to_model = SDKConfig().get_output_dir('univar_lstm_model') / 'model_4'
     model.save(path_to_model)
 
     # Plot Training and Validation Losses
@@ -64,7 +64,7 @@ def main(config: DictConfig) -> None:
         {'epochs': [idx for idx in range(config.univariate_lstm_model.epochs)], 'loss': loss, 'val_loss': val_loss}
     )
 
-    path_to_results = SDKConfig().get_output_dir("plots_univar_lstm_model_results")
+    path_to_results = SDKConfig().get_output_dir("plots_univar_lstm_model_results(model_4)")
     plot_lines_by(data=loss_df, plot_x='epochs', plot_y=['loss', 'val_loss'],
                   path_to_results=path_to_results, file_name="loss_plots.html",
                   x_title='epochs', y_title="Training Losses")
@@ -77,7 +77,7 @@ def main(config: DictConfig) -> None:
         {'epochs': [idx for idx in range(config.univariate_lstm_model.epochs)], 'mse': mse, 'mae': mae}
     )
 
-    path_to_results = SDKConfig().get_output_dir("plots_univar_lstm_model_results")
+    path_to_results = SDKConfig().get_output_dir("plots_univar_lstm_model_results(model_4)")
     plot_lines_by(data=error_df, plot_x='epochs', plot_y=['mse', 'mae'],
                   path_to_results=path_to_results, file_name="error_plots.html",
                   x_title='epochs', y_title="Training Errors")
@@ -92,7 +92,7 @@ def main(config: DictConfig) -> None:
     df_lstm_res = processed_data_dict.get('global_temperature')
     df_lstm_res = df_lstm_res.iloc[5:].assign(predictions=predictions)
 
-    path_to_results = SDKConfig().get_output_dir("plots_univar_lstm_model_results")
+    path_to_results = SDKConfig().get_output_dir("plots_univar_lstm_model_results(model_4)")
     plot_lines_by(data=df_lstm_res, plot_x='date', plot_y=['global_temperature', 'predictions'],
                   path_to_results=path_to_results, file_name="univar_lstm.html",
                   x_title='date', y_title="Actual differenced and univar LSTM Prediction")
